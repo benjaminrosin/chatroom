@@ -13,25 +13,50 @@
         <h3 class="mb-4">Register</h3>
 
         <!-- Form -->
-        <form action="/register" method="POST">
-            <!-- Email Input -->
-            <div class="mb-3">
-                <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
-            </div>
+        <% if (startRegistration) {%>
+            <form action="/signup/password" method="POST">
+                <!-- Email Input -->
+                <div class="mb-3 form-floating">
+                    <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
+                    <label for="email" class="form-label">Email</label>
+                </div>
 
-            <!-- First Name Input -->
-            <div class="mb-3">
-                <input type="text" class="form-control" id="first-name" name="first_name" placeholder="First Name" required>
-            </div>
+                <!-- First Name Input -->
+                <div class="mb-3 form-floating">
+                    <input type="text" class="form-control" id="first-name" name="first_name" placeholder="First Name"
+                           pattern="[A-Za-z]+" minlength="3" maxlength="32" required>
+                    <label for="first-name" class="form-label">First Name</label>
+                </div>
 
-            <!-- Last Name Input -->
-            <div class="mb-3">
-                <input type="text" class="form-control" id="last-name" name="last_name" placeholder="Last Name" required>
-            </div>
+                <!-- Last Name Input -->
+                <div class="mb-3 form-floating">
+                    <input type="text" class="form-control" id="last-name" name="last_name" placeholder="Last Name"
+                           pattern="[A-Za-z]+" minlength="3" maxlength="32" required>
+                    <label for="last-name" class="form-label">Last Name</label>
+                </div>
 
-            <!-- Next Button -->
-            <button type="submit" class="btn btn-primary w-100">Next</button>
-        </form>
+                <!-- Next Button -->
+                <button type="submit" class="btn btn-primary w-100">Next</button>
+
+            </form>
+        <%} else{%>
+            <form action="/signup" method="POST">
+                <div class="mb-3 form-floating">
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password"
+                           minlength="3" maxlength="32" required>
+                    <label for="password">Enter password</label>
+                </div>
+
+                <div class="mb-3 form-floating">
+                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Confirm your password"
+                           minlength="3" maxlength="32" required>
+                    <label for="confirm_password">Confirm password</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100">Signup</button>
+            </form>
+        <%}%>
+
 
         <!-- Additional Text -->
         <p class="mt-3 text-muted">Already have an account? <a href="/login">Login</a></p>
