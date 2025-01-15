@@ -24,14 +24,16 @@
                 <!-- First Name Input -->
                 <div class="mb-3 form-floating">
                     <input type="text" class="form-control" id="first-name" name="first_name" placeholder="First Name"
-                           pattern="[A-Za-z]+" minlength="3" maxlength="32" required>
+                           pattern="[A-Za-z]+" minlength="3" maxlength="32" required
+                           title="Please enter a valid first name with only letters (3 to 32 characters).">
                     <label for="first-name" class="form-label">First Name</label>
                 </div>
 
                 <!-- Last Name Input -->
                 <div class="mb-3 form-floating">
                     <input type="text" class="form-control" id="last-name" name="last_name" placeholder="Last Name"
-                           pattern="[A-Za-z]+" minlength="3" maxlength="32" required>
+                           pattern="[A-Za-z]+" minlength="3" maxlength="32" required
+                           title="Please enter a valid last name with only letters (3 to 32 characters).">
                     <label for="last-name" class="form-label">Last Name</label>
                 </div>
 
@@ -44,7 +46,8 @@
             <form action="/signup" method="POST">
                 <div class="mb-3 form-floating">
                     <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password"
-                           minlength="3" maxlength="32" required>
+                           minlength="3" maxlength="32" required
+                           title="Please enter a valid password with only letters (3 to 32 characters).">
                     <label for="password">Enter password</label>
                 </div>
 
