@@ -2,6 +2,10 @@
 <%- include('includes/head.ejs') %>
 <script src=""></script>
 
+<% if(!startRegistration){ %>
+    <script src="/javascript/password.js"></script>
+<%}%>
+
 </head>
 <body>
 <div class="d-flex justify-content-center align-items-center vh-100">
@@ -43,7 +47,7 @@
 
             </form>
         <%} else{%>
-            <form action="/signup" method="POST">
+            <form action="/signup" method="POST" id="passwordForm">
                 <div class="mb-3 form-floating">
                     <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password"
                            minlength="3" maxlength="32" required
