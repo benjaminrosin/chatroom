@@ -3,7 +3,7 @@
 <script src=""></script>
 
 <% if(!startRegistration){ %>
-    <script src="/javascript/password.js"></script>
+    <script src="/javascripts/password.js"></script>
 <%}%>
 
 </head>
@@ -60,6 +60,8 @@
                            minlength="3" maxlength="32" required>
                     <label for="confirm_password">Confirm password</label>
                 </div>
+
+                <p class="text-danger">  </p>
 
                 <button type="submit" class="btn btn-primary w-100">Signup</button>
             </form>
