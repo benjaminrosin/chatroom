@@ -2,6 +2,8 @@
 <%- include('includes/head.ejs') %>
 <script src=""></script>
 
+<script src="/javascripts/signup.js"></script>
+
 <% if(!startRegistration){ %>
     <script src="/javascripts/password.js"></script>
 <%}%>
@@ -63,7 +65,7 @@
 
                 <p class="text-danger">  </p>
 
-                <button type="submit" class="btn btn-secondary w-100">Back</button>
+                <button type="button" class="btn btn-secondary w-100 mb-3" id="backBtn">Back</button>
                 <button type="submit" class="btn btn-primary w-100">Signup</button>
             </form>
         <%}%>
@@ -74,5 +76,4 @@
     </div>
 </div>
 
-<script src="/javascripts/signup.js"></script>
 <%- include('includes/end.ejs') %>

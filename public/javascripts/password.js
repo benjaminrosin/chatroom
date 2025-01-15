@@ -1,8 +1,13 @@
 
-const DOM = (function(){
+const Dom = (function(){
     document.addEventListener("DOMContentLoaded", function () {
 
         const form = document.getElementById("passwordForm");
+        const back =document.getElementById("backBtn");
+
+        back.addEventListener("click", function(){
+            window.location.replace('/signup');
+        })
 
         form.addEventListener("submit", function(event){
             const passwords = Array.from(form.querySelectorAll('[type="password"]'));
