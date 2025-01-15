@@ -18,7 +18,7 @@
 
         <!-- Form -->
         <% if (startRegistration) {%>
-            <form action="/signup/password" method="POST">
+            <form action="/signup/password" method="POST" id="signUpForm">
                 <!-- Email Input -->
                 <div class="mb-3 form-floating">
                     <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
@@ -60,7 +60,7 @@
                            minlength="3" maxlength="32" required>
                     <label for="confirm_password">Confirm password</label>
                 </div>
-
+                <button type="submit" class="btn btn-secondary w-100">Back</button>
                 <button type="submit" class="btn btn-primary w-100">Signup</button>
             </form>
         <%}%>
@@ -71,4 +71,5 @@
     </div>
 </div>
 
+<script src="/javascripts/signup.js"></script>
 <%- include('includes/end.ejs') %>
