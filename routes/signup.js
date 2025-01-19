@@ -18,9 +18,11 @@ router.post('/', function(req, res, next) {
     }
 
 })
-
+router.get('/password', function(req, res, next) {
+    res.render('signup', { title: 'Signup' , startRegistration: true, errorMsg: ''});
+})
 router.post('/password', function(req, res, next) {
-    if(userList.findUser(req.body.email.trim().toLowerCase())){
+    if(userList.findUser(req.body.email.trim())){
         res.render('signup', { title: 'Signup' , startRegistration: true , errorMsg: 'email already in use'});
     }
     else{

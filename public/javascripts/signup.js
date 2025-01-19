@@ -4,11 +4,11 @@ const DOM = (function(){
     document.addEventListener("DOMContentLoaded", function (){
         const signUpForm = document.getElementById("signUpForm");
         const passwordForm = document.getElementById("passwordForm");
-        const backBtn =document.getElementById("backBtn");
+        const backBtn = document.getElementById("backBtn");
 
         fillFormWithCookies();
 
-        signUpForm.addEventListener("submit", function(e){
+        signUpForm?.addEventListener("submit", function(e){
             const registerData = {
                 email: document.getElementById("email").value.trim(),
                 firstName: document.getElementById("first-name").value.trim(),
@@ -18,13 +18,12 @@ const DOM = (function(){
             setCookie("registerData", registerData, REGISTER);
         })
 
-
-
-        backBtn.addEventListener("click", function(){
+        backBtn?.addEventListener("click", function(){
             window.location.replace('/signup');
         })
 
-        passwordForm.addEventListener("submit", function(event){
+
+        passwordForm?.addEventListener("submit", function(event){
 
             const passwords = Array.from(passwordForm.querySelectorAll('[type="password"]'));
             const passwordA = passwords[0].value.trim();
@@ -62,14 +61,18 @@ const DOM = (function(){
     function fillFormWithCookies() {
         const registerData = getCookie("registerData");
         if (registerData) {
-            if (registerData.email) {
-                document.getElementById("email").value = registerData.email;
+            const email = document.getElementById("email");
+            const firstName = document.getElementById("first-name");
+            const lastName = document.getElementById("last-name");
+
+            if (email) {
+                email.value = registerData.email;
             }
-            if (registerData.firstName) {
-                document.getElementById("first-name").value = registerData.firstName;
+            if (firstName) {
+                firstName.value = registerData.firstName;
             }
-            if (registerData.lastName) {
-                document.getElementById("last-name").value = registerData.lastName;
+            if (lastName) {
+                lastName.value = registerData.lastName;
             }
         }
     }

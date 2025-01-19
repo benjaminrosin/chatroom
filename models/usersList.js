@@ -1,6 +1,6 @@
 
 module.exports = (function () {
-    const users = [];
+    const users = [{email:"benjamin.rosin@gmail.com"}];
 
     class USER{
         constructor(reqBody) {
@@ -14,6 +14,7 @@ module.exports = (function () {
         }
     }
     function addUser(user) {
+        console.log(user);
         if (!findUser(user.email)){
             users.push(user);
             return true;
@@ -22,7 +23,10 @@ module.exports = (function () {
     }
 
     function findUser(email) {
-        return users.find(user => user.email === email);
+        const val = users.some(user => user.email === email);
+        console.log(val);
+        console.log(users);
+        return val;
     }
 
     return{
