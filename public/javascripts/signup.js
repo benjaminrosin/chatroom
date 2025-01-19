@@ -2,18 +2,54 @@ const REGISTER = 30;
 
 const DOM = (function(){
     document.addEventListener("DOMContentLoaded", function (){
-        const form = document.getElementById("signUpForm");
+        const signUpForm = document.getElementById("signUpForm");
+        const passwordForm = document.getElementById("passwordForm");
+        const backBtn =document.getElementById("backBtn");
+
         fillFormWithCookies();
 
-        form.addEventListener("submit", function(e){
+        signUpForm.addEventListener("submit", function(e){
             const registerData = {
-                email: document.getElementById("email").value,
-                firstName: document.getElementById("first-name").value,
-                lastName: document.getElementById("last-name").value
+                email: document.getElementById("email").value.trim(),
+                firstName: document.getElementById("first-name").value.trim(),
+                lastName: document.getElementById("last-name").value.trim()
             };
 
             setCookie("registerData", registerData, REGISTER);
         })
+
+
+
+        backBtn.addEventListener("click", function(){
+            window.location.replace('/signup');
+        })
+
+        passwordForm.addEventListener("submit", function(event){
+
+            const passwords = Array.from(passwordForm.querySelectorAll('[type="password"]'));
+            const passwordA = passwords[0].value.trim();
+            const passwordB = passwords[1].value.trim();
+            const errorMessage = passwordForm.querySelector(".text-danger");
+            const registerData = getCookie("registerData");
+
+            if(passwordA !== passwordB || !registerData){
+                event.preventDefault();
+                if (!registerData){
+                    window.location.replace('/signup');
+                    errorMessage.innerHTML = 'The registration time was too long, please start registration again.';
+                    //this error msg is in the password part
+                }
+                else{
+                    errorMessage.innerHTML = 'The passwords are not matching';
+                }
+                return;
+            }
+
+            passwordForm.getElementsByTagName("email")[0].value = registerData.email;
+            passwordForm.getElementsByTagName("first_name")[0].value = registerData.firstName;
+            passwordForm.getElementsByTagName("last_name")[0].value = registerData.lastName;
+        })
+
     })
 
     function setCookie(name, value, seconds) {
@@ -54,6 +90,7 @@ const DOM = (function(){
         }
         return null;
     }
+
     return{};
 }());
 
