@@ -24,7 +24,6 @@ const DOM = (function(){
 
 
         passwordForm?.addEventListener("submit", function(event){
-            event.preventDefault();
 
             const passwords = Array.from(passwordForm.querySelectorAll('[type="password"]'));
             const passwordA = passwords[0].value.trim();
@@ -33,6 +32,7 @@ const DOM = (function(){
             const registerData = getCookie("registerData");
 
             if(passwordA !== passwordB || !registerData){
+                event.preventDefault();
                 if (!registerData){
                     window.location.replace('/signup');
                     errorMessage.innerHTML = 'The registration time was too long, please start registration again.';
@@ -48,7 +48,6 @@ const DOM = (function(){
             passwordForm.querySelector("[name='first_name']").value = registerData.firstName;
             passwordForm.querySelector("[name='last_name']").value = registerData.lastName;
 
-            passwordForm.submit();
         })
 
     })
