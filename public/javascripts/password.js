@@ -14,9 +14,9 @@ const Dom = (function(){
             const passwordA = passwords[0].value.trim();
             const passwordB = passwords[1].value.trim();
 
-            console.log(passwordA, passwordB);
+            //get cookie
 
-            if(passwordA !== passwordB){
+            if(passwordA !== passwordB /* || cookie is null*/){
                 event.preventDefault();
                 passwords.forEach(function(field){field.classList.add('invalid');});
 
@@ -25,6 +25,10 @@ const Dom = (function(){
                     errorMessage.innerHTML = 'The passwords are not matching';
                 }
             }
+
+            form.getElementsByTagName("email")[0].value = "";
+            form.getElementsByTagName("first_name")[0].value = "";
+            form.getElementsByTagName("last_name")[0].value = "";
         })
 
     })
