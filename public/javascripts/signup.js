@@ -6,37 +6,35 @@ const DOM = (function(){
         fillFormWithCookies();
 
         form.addEventListener("submit", function(e){
-            e.preventDefault();
-            const email = document.getElementById("email").value;
-            const firstName = document.getElementById("first-name").value;
-            const lastName = document.getElementById("last-name").value;
+            const registerData = {
+                email: document.getElementById("email").value,
+                firstName: document.getElementById("first-name").value,
+                lastName: document.getElementById("last-name").value
+            };
 
-            setCookie("email", email, REGISTER);
-            setCookie("first_name", firstName, REGISTER);
-            setCookie("last_name", lastName, REGISTER);
-            form.submit();
+            setCookie("registerData", registerData, REGISTER);
         })
     })
+
     function setCookie(name, value, seconds) {
         const date = new Date();
         date.setTime(date.getTime() + (seconds * 1000));
         const expires = "expires=" + date.toUTCString();
-        document.cookie = `${name}=${value}; ${expires}; path=/`;
+        document.cookie = `${name}=${JSON.stringify(value)}; ${expires}; path=/`;
     }
 
     function fillFormWithCookies() {
-        const email = getCookie("email");
-        const firstName = getCookie("first_name");
-        const lastName = getCookie("last_name");
-
-        if (email) {
-            document.getElementById("email").value = email;
-        }
-        if (firstName) {
-            document.getElementById("first-name").value = firstName;
-        }
-        if (lastName) {
-            document.getElementById("last-name").value = lastName;
+        const registerData = getCookie("registerData");
+        if (registerData) {
+            if (registerData.email) {
+                document.getElementById("email").value = registerData.email;
+            }
+            if (registerData.firstName) {
+                document.getElementById("first-name").value = registerData.firstName;
+            }
+            if (registerData.lastName) {
+                document.getElementById("last-name").value = registerData.lastName;
+            }
         }
     }
 
@@ -45,12 +43,17 @@ const DOM = (function(){
         for (let cookie of cookies) {
             const [key, value] = cookie.split("=");
             if (key === name) {
-                return value;
+                try {
+                    return JSON.parse(value);
+                }
+                catch (e) {
+                    console.error("Error parsing cookie:", e);
+                    return null;
+                }
             }
         }
         return null;
     }
-
     return{};
 }());
 
