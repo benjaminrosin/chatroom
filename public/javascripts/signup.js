@@ -35,7 +35,8 @@ const DOM = (function(){
                 event.preventDefault();
                 if (!registerData){
                     window.location.replace('/signup');
-                    errorMessage.innerHTML = 'The registration time was too long, please start registration again.';
+                    return;
+                    //errorMessage.innerHTML = 'The registration time was too long, please start registration again.';
                     //this error msg is in the password part
                 }
                 else{
