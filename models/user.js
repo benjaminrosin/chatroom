@@ -5,10 +5,11 @@ const { DataTypes } = require('sequelize');
 const User = sequelize.define('User', {
     email: {
         type: DataTypes.STRING,
-        unique: {msg: 'Email already in use'},
+        unique: {args:true, msg: "Email already in use"},
         validate: {
-            isEmail: true,
-            msg: 'E-mail address required'
+            isEmail: {args: true,
+                msg: 'E-mail address required'
+            }
         }
     },
     firstName: {
@@ -17,8 +18,7 @@ const User = sequelize.define('User', {
         notEmpty: true,
         validate: {
             isAlpha: true,
-            len: [3, 32],
-            msg: 'First name is required'
+            len: [3, 32]
         }
     },
     lastName: {
@@ -26,8 +26,7 @@ const User = sequelize.define('User', {
         allowNull: false,
         validate: {
             isAlpha: true,
-            len: [3, 32],
-            msg: 'Last name is required'
+            len: [3, 32]
         }
     },
     password: {
@@ -38,16 +37,17 @@ const User = sequelize.define('User', {
             len: [3, 32]
         }
     },
-
-    /*hooks: {
-        beforeCreate(sequelize) {
-            //hash password
-            console.log('beforeCreate');
-        }
-    }*/
-}, {
-    modelName: 'User',
-});
+},
+    {
+        hooks: {
+            beforeCreate(sequelize) {
+                //hash password
+                console.log('beforeCreate');
+            }
+        },
+        modelName: 'User',
+    }
+);
 
 /*
 Contact.hasMany(Order, {

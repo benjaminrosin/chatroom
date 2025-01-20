@@ -8,20 +8,18 @@ const REGISTER = 30;
 router.get('/', function(req, res, next) {
     res.render('signup', { title: 'Signup' , startRegistration: true, errorMsg: ''});
 });
-/*
 
- */
 router.post('/', async function(req, res, next) {
-    console.log(13);
     if(!req.cookies.registerData){
-        console.log('if cookie is not exsi')
         res.render('signup', { title: 'Signup' , startRegistration: true , errorMsg: 'session expired, please try again' });
     }
     else {
         try {
-            const email = req.cookies.registerData.email.trim().toLowerCase();
-            const fName = req.cookies.registerData.firstName.trim().toLowerCase();
-            const lName = req.cookies.registerData.lastName.trim().toLowerCase();
+            const registerData = JSON.parse(req.cookies.registerData);
+
+            const email = registerData.email.trim().toLowerCase();
+            const fName = registerData.firstName.trim().toLowerCase();
+            const lName = registerData.lastName.trim().toLowerCase();
             const password = req.body.password.trim().toLowerCase();
 
             await users.User.create({email: email, firstName: fName, lastName: lName, password: password});
@@ -29,42 +27,30 @@ router.post('/', async function(req, res, next) {
             res.render('login', {title: 'Login', msg: 'you are now registered'});
         }
         catch(err) {
-            res.render('signup', {title: 'Signup', startRegistration: true, errorMsg: err.message});
+            console.log(err);
+            res.render('signup', {title: 'Signup', startRegistration: true, errorMsg: "cannot signup, please try again later."});
         }
-        /*if (userList.addUser(new userList.USER(req.body))) {
-            //if(true){
-            //delete cookie
-            console.log('before delete')
-            res.clearCookie('registerData')
-            res.render('login', {title: 'Login', msg: 'you are now registered'});
-        } else {
-            console.log(26)
-            res.render('signup', {title: 'Signup', startRegistration: true, errorMsg: 'email already in use'});
-        }*/
     }
 })
 router.get('/password', function(req, res, next) {
-    res.render('signup', { title: 'Signup' , startRegistration: true, errorMsg: ''});
+    res.render('signup', { title: 'Signup' , startRegistration: true, errorMsg: 'row 49'});
 })
 router.post('/password', async function(req, res, next) {
     const email = req.body.email.trim().toLowerCase();
     const result = await users.User.findOne({where: {email: email}});
 
     if(!result){
-        res.cookie('registerData',{
-            email: email,
-            firstName: req.body.first_name.trim().toLowerCase(),
-            lastName: req.body.last_name.trim().toLowerCase()},
+        res.cookie('registerData',
+            JSON.stringify({
+                email: email,
+                firstName: req.body.first_name.trim().toLowerCase(),
+                lastName: req.body.last_name.trim().toLowerCase()
+            }),
             {
-                maxAge: 1000 * REGISTER
+                maxAge: 1000 * REGISTER, // Set cookie expiration
             }
         );
         res.render('signup', { title: 'Signup' , startRegistration: false, errorMsg: ''});
-
-        /*router.post('/password', function(req, res, next) {
-    if(userList.findUser(req.body.email.trim())){
-
-        res.render('signup', { title: 'Signup' , startRegistration: true , errorMsg: 'email already in use'});*/
     }
     else{
         res.render('signup', { title: 'Signup' , startRegistration: true , errorMsg: 'Email already in use'});

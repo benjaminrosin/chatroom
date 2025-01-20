@@ -6,7 +6,9 @@ const DOM = (function(){
         const passwordForm = document.getElementById("passwordForm");
         const backBtn = document.getElementById("backBtn");
 
-        fillFormWithCookies();
+        if (signUpForm) {
+            fillFormWithCookies();
+        }
 
         signUpForm?.addEventListener("submit", function(e){
             /*const registerData = {
@@ -29,26 +31,15 @@ const DOM = (function(){
             const passwordA = passwords[0].value.trim();
             const passwordB = passwords[1].value.trim();
             const errorMessage = passwordForm.querySelector(".text-danger");
-            const registerData = getCookie("registerData");
 
-
-            if(passwordA !== passwordB || !registerData){
+            if(passwordA !== passwordB){
                 event.preventDefault();
-                if (!registerData){
-                    window.location.replace('/signup');
-                    return;
-                    //errorMessage.innerHTML = 'The registration time was too long, please start registration again.';
-                    //this error msg is in the password part
-                }
-                else{
-                    errorMessage.innerHTML = 'The passwords are not matching';
-                }
-                return;
+                errorMessage.innerHTML = 'The passwords are not matching';
             }
 
-            passwordForm.querySelector("[name='email']").value = registerData.email;
-            passwordForm.querySelector("[name='first_name']").value = registerData.firstName;
-            passwordForm.querySelector("[name='last_name']").value = registerData.lastName;
+            //passwordForm.querySelector("[name='email']").value = registerData.email;
+            //passwordForm.querySelector("[name='first_name']").value = registerData.firstName;
+            //passwordForm.querySelector("[name='last_name']").value = registerData.lastName;
 
         })
 
@@ -90,7 +81,7 @@ const DOM = (function(){
             const [key, value] = cookie.split("=");
             if (key === name) {
                 try {
-                    return JSON.parse(value);
+                    return JSON.parse(decodeURIComponent(value));
                 }
                 catch (e) {
                     console.error("Error parsing cookie:", e);
