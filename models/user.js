@@ -1,6 +1,8 @@
 'use strict';
 const sequelize = require('./index');
 const { DataTypes } = require('sequelize');
+const bcrypt = require('bcrypt');
+const {hashSync} = require("bcrypt");
 
 const User = sequelize.define('User', {
     email: {
@@ -38,9 +40,14 @@ const User = sequelize.define('User', {
 },
     {
         hooks: {
-            beforeCreate(sequelize) {
+            beforeCreate: async (user) => {
+                console.log(`before: ${user.password}`);
+
+                const salt = await bcrypt.genSaltSync(10, 'a');
+                user.password = hashSync(user.password, salt);
+
                 //hash password
-                console.log('beforeCreate');
+                console.log(`after: ${user.password}`);
             }
         },
         modelName: 'User',

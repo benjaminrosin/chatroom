@@ -25,7 +25,7 @@ router.post('/', async function(req, res, next) {
 
             await users.User.create({email: email, firstName: fName, lastName: lName, password: password});
 
-            res.render('login', {title: 'Login', msg: 'you are now registered'});
+            res.render('login', {title: 'Login', msg: 'you are now registered', errMsg: ''});
         }
         catch(err) {
             if (err.errors[0] instanceof ValidationErrorItem) {
