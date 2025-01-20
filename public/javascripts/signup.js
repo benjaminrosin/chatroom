@@ -1,4 +1,4 @@
-const REGISTER = 30;
+//const REGISTER = 10;
 
 const DOM = (function(){
     document.addEventListener("DOMContentLoaded", function (){
@@ -9,13 +9,13 @@ const DOM = (function(){
         fillFormWithCookies();
 
         signUpForm?.addEventListener("submit", function(e){
-            const registerData = {
+            /*const registerData = {
                 email: document.getElementById("email").value.trim(),
                 firstName: document.getElementById("first-name").value.trim(),
                 lastName: document.getElementById("last-name").value.trim()
             };
 
-            setCookie("registerData", registerData, REGISTER);
+            setCookie("registerData", registerData, REGISTER);*/
         })
 
         backBtn?.addEventListener("click", function(){
@@ -31,11 +31,13 @@ const DOM = (function(){
             const errorMessage = passwordForm.querySelector(".text-danger");
             const registerData = getCookie("registerData");
 
+
             if(passwordA !== passwordB || !registerData){
                 event.preventDefault();
                 if (!registerData){
                     window.location.replace('/signup');
-                    errorMessage.innerHTML = 'The registration time was too long, please start registration again.';
+                    return;
+                    //errorMessage.innerHTML = 'The registration time was too long, please start registration again.';
                     //this error msg is in the password part
                 }
                 else{
@@ -44,19 +46,20 @@ const DOM = (function(){
                 return;
             }
 
-            passwordForm.getElementsByTagName("email")[0].value = registerData.email;
-            passwordForm.getElementsByTagName("first_name")[0].value = registerData.firstName;
-            passwordForm.getElementsByTagName("last_name")[0].value = registerData.lastName;
+            passwordForm.querySelector("[name='email']").value = registerData.email;
+            passwordForm.querySelector("[name='first_name']").value = registerData.firstName;
+            passwordForm.querySelector("[name='last_name']").value = registerData.lastName;
+
         })
 
     })
 
-    function setCookie(name, value, seconds) {
+    /*function setCookie(name, value, seconds) {
         const date = new Date();
         date.setTime(date.getTime() + (seconds * 1000));
         const expires = "expires=" + date.toUTCString();
         document.cookie = `${name}=${JSON.stringify(value)}; ${expires}; path=/`;
-    }
+    }*/
 
     function fillFormWithCookies() {
         const registerData = getCookie("registerData");
@@ -78,8 +81,12 @@ const DOM = (function(){
     }
 
     function getCookie(name) {
+        if(!document.cookie){
+            return null;
+        }
         const cookies = document.cookie.split("; ");
         for (let cookie of cookies) {
+            //console.log(cookie)
             const [key, value] = cookie.split("=");
             if (key === name) {
                 try {
