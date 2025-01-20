@@ -7,9 +7,7 @@ const User = sequelize.define('User', {
         type: DataTypes.STRING,
         unique: {args:true, msg: "Email already in use"},
         validate: {
-            isEmail: {args: true,
-                msg: 'E-mail address required'
-            }
+            isEmail: {args: true, msg: "E-mail address required"}
         }
     },
     firstName: {
@@ -17,24 +15,24 @@ const User = sequelize.define('User', {
         allowNull: false,
         notEmpty: true,
         validate: {
-            isAlpha: true,
-            len: [3, 32]
+            isAlpha: {args: true, msg: "First name must consist of letters"},
+            len: {args: [3, 32], msg: "Length must be between 3, 32"}
         }
     },
     lastName: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-            isAlpha: true,
-            len: [3, 32]
+            isAlpha: {args: true, msg: "Last name must consist of letters"},
+            len: {args: [3, 32], msg: "Length must be between 3, 32"}
         }
     },
     password: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-            isAlphanumeric: true,
-            len: [3, 32]
+            isAlphanumeric: {args: true, msg: "Password can contain only alphanumeric characters."},
+            len: {args: [3, 32], msg: "Length must be between 3, 32"}
         }
     },
 },

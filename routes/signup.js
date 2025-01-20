@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const users = require('../models/user');
+const {ValidationErrorItem} = require("sequelize");
 const REGISTER = 30;
 
 
@@ -27,8 +28,14 @@ router.post('/', async function(req, res, next) {
             res.render('login', {title: 'Login', msg: 'you are now registered'});
         }
         catch(err) {
-            console.log(err);
-            res.render('signup', {title: 'Signup', startRegistration: true, errorMsg: "cannot signup, please try again later."});
+            if (err.errors[0] instanceof ValidationErrorItem) {
+                console.log(err.errors[0]);
+                res.render('signup', {title: 'Signup', startRegistration: true, errorMsg: err.errors[0].message});
+            }
+            else{
+                console.log(err);
+                res.render('signup', {title: 'Signup', startRegistration: true, errorMsg: "cannot signup, please try again later."});
+            }
         }
     }
 })
