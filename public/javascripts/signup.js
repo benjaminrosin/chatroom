@@ -10,20 +10,9 @@ const DOM = (function(){
             fillFormWithCookies();
         }
 
-        signUpForm?.addEventListener("submit", function(e){
-            /*const registerData = {
-                email: document.getElementById("email").value.trim(),
-                firstName: document.getElementById("first-name").value.trim(),
-                lastName: document.getElementById("last-name").value.trim()
-            };
-
-            setCookie("registerData", registerData, REGISTER);*/
-        })
-
         backBtn?.addEventListener("click", function(){
             window.location.replace('/signup');
         })
-
 
         passwordForm?.addEventListener("submit", function(event){
 
@@ -36,21 +25,9 @@ const DOM = (function(){
                 event.preventDefault();
                 errorMessage.innerHTML = 'The passwords are not matching';
             }
-
-            //passwordForm.querySelector("[name='email']").value = registerData.email;
-            //passwordForm.querySelector("[name='first_name']").value = registerData.firstName;
-            //passwordForm.querySelector("[name='last_name']").value = registerData.lastName;
-
         })
 
     })
-
-    /*function setCookie(name, value, seconds) {
-        const date = new Date();
-        date.setTime(date.getTime() + (seconds * 1000));
-        const expires = "expires=" + date.toUTCString();
-        document.cookie = `${name}=${JSON.stringify(value)}; ${expires}; path=/`;
-    }*/
 
     function fillFormWithCookies() {
         const registerData = getCookie("registerData");
