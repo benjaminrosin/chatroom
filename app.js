@@ -9,6 +9,7 @@ const sequelize = require('./models/index');
 //var usersRouter = require('./routes/users');
 const loginRouter = require('./routes/login');
 const signupRouter = require('./routes/signup');
+const chatRouter = require('./routes/chatroom');
 //const passwordRouter = require('./routes/password');
 
 const app = express();
@@ -40,6 +41,7 @@ app.get('/', function(req, res, next) {
 
 app.use('/login', loginRouter);
 app.use('/signup', signupRouter);
+app.use('/chatroom', chatRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

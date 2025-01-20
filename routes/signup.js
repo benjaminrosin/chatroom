@@ -23,6 +23,7 @@ router.post('/', async function(req, res, next) {
             const lName = registerData.lastName.trim().toLowerCase();
             const password = req.body.password.trim().toLowerCase();
 
+            res.clearCookie('registerData');
             await users.User.create({email: email, firstName: fName, lastName: lName, password: password});
 
             res.render('login', {title: 'Login', msg: 'you are now registered', errMsg: ''});
