@@ -1,4 +1,3 @@
-//const REGISTER = 10;
 
 const DOM = (function(){
     document.addEventListener("DOMContentLoaded", function (){
