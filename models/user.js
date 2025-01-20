@@ -5,7 +5,7 @@ const { DataTypes } = require('sequelize');
 const User = sequelize.define('User', {
     email: {
         type: DataTypes.STRING,
-        unique: true,
+        unique: {msg: 'Email already in use'},
         validate: {
             isEmail: true,
             msg: 'E-mail address required'
