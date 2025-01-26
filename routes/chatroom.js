@@ -35,7 +35,12 @@ router.get('/', async function(req, res, next) {
 
         req.session.lastUpdate = Date.now()
 
-        res.render('chatroom', { title: 'Chat', messages: newMessages });
+        const user = await users.User.findOne({
+            select: ['firstName'],
+            where:{id: req.session.user.id}
+        });
+
+        res.render('chatroom', { title: 'Chat', firstName: user.firstName, messages: newMessages });
     }
     catch(err){
         console.log(err);
