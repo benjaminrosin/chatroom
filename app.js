@@ -4,7 +4,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const sequelize = require('./models/index');
-
+const session = require('express-session')
 //var indexRouter = require('./routes/index');
 //var usersRouter = require('./routes/users');
 const loginRouter = require('./routes/login');
@@ -35,15 +35,21 @@ app.use(express.static(path.join(__dirname, 'public')));
   }
 })();
 
+app.use(session({
+  secret: 'secretSessionId',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {maxAge: 60 * 60 * 1000} // 1 hour
+}));
 
-
-app.get('/', function(req, res, next) {
-  if (req.session.user) {
-    if (req.session.user.logged_in){
-
-    }
+app.use('/', function(req, res, next) {
+  if (!req.session.user || !req.session.user.isLoggedIn) {
+    return res.redirect('/login');
   }
-  res.redirect('/login');
+  else{
+    return res.redirect('/chatroom');
+  }
+  //next();
 });
 
 app.use('/login', loginRouter);
