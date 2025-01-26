@@ -16,7 +16,6 @@ router.post('/', async function(req, res) {
         if (match) {
             req.session.user = {
                 id: user.id,
-                email: user.email,
                 isLoggedIn: true
             };
             res.redirect('chatroom');
