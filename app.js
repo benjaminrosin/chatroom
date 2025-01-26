@@ -35,7 +35,14 @@ app.use(express.static(path.join(__dirname, 'public')));
   }
 })();
 
+
+
 app.get('/', function(req, res, next) {
+  if (req.session.user) {
+    if (req.session.user.logged_in){
+
+    }
+  }
   res.redirect('/login');
 });
 
