@@ -39,11 +39,12 @@ app.use(session({
   secret: 'secretSessionId',
   resave: false,
   saveUninitialized: false,
+  lastUpdated: new Date(),
   cookie: {maxAge: 60 * 60 * 1000} // 1 hour
 }));
 
-app.use('/', function(req, res, next) {
-  if (!req.session.user || !req.session.user.isLoggedIn) {
+app.get('/', function(req, res, next) {
+  if (false /*&& !req.session.user || !req.session.user.isLoggedIn*/) {
     return res.redirect('/login');
   }
   else{

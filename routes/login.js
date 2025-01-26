@@ -19,6 +19,7 @@ router.post('/', async function(req, res) {
                 email: user.email,
                 isLoggedIn: true
             };
+            req.session.lastUpdated = new Date();
             res.redirect('chatroom');
         }
         else{

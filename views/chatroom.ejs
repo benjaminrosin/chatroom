@@ -41,55 +41,22 @@
 
 <!-- Main content -->
 <div class="container mt-4">
-    <div class="message-area border rounded p-3" style="height: 60vh; overflow-y: auto;">
+    <div class="message-area border rounded p-3" id="messageArea" style="height: 60vh; overflow-y: auto;">
         <!-- Example message (from others) -->
-        <div class="message mb-3">
-            <p class="mb-1"><strong>John Doe</strong> <small class="text-muted">2025-01-26 12:34 PM</small></p>
-            <p class="mb-1">This is a sample message from another user.</p>
-        </div>
-        <div class="message mb-3">
-            <p class="mb-1"><strong>John Doe</strong> <small class="text-muted">2025-01-26 12:34 PM</small></p>
-            <p class="mb-1">This is a sample message from another user.</p>
-        </div>
-        <div class="message mb-3">
-            <p class="mb-1"><strong>John Doe</strong> <small class="text-muted">2025-01-26 12:34 PM</small></p>
-            <p class="mb-1">This is a sample message from another user.</p>
-        </div>
-        <div class="message mb-3">
-            <p class="mb-1"><strong>John Doe</strong> <small class="text-muted">2025-01-26 12:34 PM</small></p>
-            <p class="mb-1">This is a sample message from another user.</p>
-        </div>
-        <div class="message mb-3">
-            <p class="mb-1"><strong>John Doe</strong> <small class="text-muted">2025-01-26 12:34 PM</small></p>
-            <p class="mb-1">This is a sample message from another user.</p>
-        </div>
-        <div class="message mb-3">
-            <p class="mb-1"><strong>John Doe</strong> <small class="text-muted">2025-01-26 12:34 PM</small></p>
-            <p class="mb-1">This is a sample message from another user.</p>
-        </div>
-        <div class="message mb-3">
-            <p class="mb-1"><strong>John Doe</strong> <small class="text-muted">2025-01-26 12:34 PM</small></p>
-            <p class="mb-1">This is a sample message from another user.</p>
-        </div>
-        <div class="message mb-3">
-            <p class="mb-1"><strong>John Doe</strong> <small class="text-muted">2025-01-26 12:34 PM</small></p>
-            <p class="mb-1">This is a sample message from another user.</p>
-        </div>
-        <div class="message mb-3">
-            <p class="mb-1"><strong>John Doe</strong> <small class="text-muted">2025-01-26 12:34 PM</small></p>
-            <p class="mb-1">This is a sample message from another user.</p>
-        </div><div class="message mb-3">
-            <p class="mb-1"><strong>John Doe</strong> <small class="text-muted">2025-01-26 12:34 PM</small></p>
-            <p class="mb-1">This is a sample message from another user.</p>
-        </div><div class="message mb-3">
-            <p class="mb-1"><strong>John Doe</strong> <small class="text-muted">2025-01-26 12:34 PM</small></p>
-            <p class="mb-1">This is a sample message from another user.</p>
-        </div>
-        <div class="message mb-3">
-            <p class="mb-1"><strong>John Doe</strong> <small class="text-muted">2025-01-26 12:34 PM</small></p>
-            <p class="mb-1">This is a sample message from another user.</p>
-        </div>
+        <% messages.forEach(message => {%>
 
+            <div class="message mb-3" id= <%= message.id %> >
+                <p class="mb-1"><strong> <%= message.firstName + ' ' + message.lastName %> </strong> <small class="text-muted"> <%= /*printableDate*/(message.createdAt) %> </small></p>
+                <p class="mb-1"> <%= message.content %></p>
+            </div>
+
+        <% }); %>
+
+
+        <div class="message mb-3">
+            <p class="mb-1"><strong>John Doe</strong> <small class="text-muted">2025-01-26 12:34 PM</small></p>
+            <p class="mb-1">This is a sample message from another user.</p>
+        </div>
 
 
 
@@ -131,40 +98,22 @@
                         <small class="text-muted me-2">2025-01-26 12:35 PM</small>
                         <button class="btn bi bi-trash"></button>
                         <button class="btn bi bi-pencil"></button>
-
-                        <!--
-                        <button class="btn btn-sm btn-outline-danger me-2 bi bi-trash"></button>
-                        <button class="btn btn-sm btn-outline-primary me-2 bi bi-pencil"></button>
-                        -->
                     </p>
                     <p class="mb-1">This is a sample message from me.</p>
                 </div>
             </div>
         </div>
-
-
-
     </div>
 
     <!-- Message input form -->
     <form class="mt-3" id="messageForm">
         <div class="input-group">
-            <input type="text" class="form-control" id="messageInput" placeholder="Type your message..." required>
+            <input type="text" class="form-control" id="messageInput" name="message" placeholder="Type your message..." required>
             <button type="submit" class="btn btn-primary">Send</button>
         </div>
+        <p class="text-danger mb-0" id="errMsg"></p>
     </form>
 </div>
-
-<script>
-    // Form validation to ensure the input is not empty
-    document.getElementById('messageForm').addEventListener('submit', function(e) {
-        const input = document.getElementById('messageInput');
-        if (!input.value.trim()) {
-            e.preventDefault();
-            alert('Message cannot be empty!');
-        }
-    });
-</script>
 
 
 

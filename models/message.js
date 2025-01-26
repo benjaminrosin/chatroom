@@ -1,7 +1,7 @@
 'use strict';
 const sequelize = require('./index');
 const { DataTypes } = require('sequelize');
-const USER = require('/models/user');
+const USER = require('./user');
 
 const Message = sequelize.define('Message', {
         content: {
@@ -24,11 +24,11 @@ const Message = sequelize.define('Message', {
 
 
 USER.User.hasMany(Message, {
-    foreignKey: 'contact_id'
+    foreignKey: 'user_id'
 });
 
 Message.belongsTo(USER.User, {
-    foreignKey: 'contact_id'
+    foreignKey: 'user_id'
 });
 
 module.exports = { Message };
