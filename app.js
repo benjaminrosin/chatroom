@@ -40,16 +40,25 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   lastUpdated: new Date(),
-  cookie: {maxAge: 60 * 60 * 1000} // 1 hour
+  cookie: {maxAge:60 * 60 * 1000} // 1 hour
 }));
 
+app.get('/logout', function(req, res) {
+  req.session.destroy((err) => {
+    if(err) {
+      console.log("Error destroying session:", err);
+      return res.redirect('/chatroom');
+    }
+    // Redirect to login page after successful logout
+    res.redirect('/login');
+  });
+});
+
 app.get('/', function(req, res, next) {
-  if (false /*&& !req.session.user || !req.session.user.isLoggedIn*/) {
+  if (!req.session.user || !req.session.user.isLoggedIn) {
     return res.redirect('/login');
   }
-  else{
-    return res.redirect('/chatroom');
-  }
+  return res.redirect('/chatroom');
   //next();
 });
 

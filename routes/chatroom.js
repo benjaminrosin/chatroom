@@ -5,6 +5,24 @@ const messages = require('../models/message');
 const {Op} = require("sequelize");
 const {Json} = require("sequelize/lib/utils");
 
+/*
+router.get('/',  async function(req, res, next) {
+    if (!req.session.user || !req.session.user.isLoggedIn) {
+        return res.redirect('/logout');
+    }
+    const user = await users.User.findOne({
+        select: ['firstName'],
+        where:{id: req.session.user.id}
+    });
+
+    res.render('chatroom', {
+        title: 'Chat',
+        firstName: user.firstName
+    });
+});
+
+ */
+
 router.get('/', async function(req, res, next) {
     // load all old messages
     try{

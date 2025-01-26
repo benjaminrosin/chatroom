@@ -16,7 +16,6 @@ router.post('/', async function(req, res) {
         if (match) {
             req.session.user = {
                 id: user.id,
-                email: user.email,
                 isLoggedIn: true
             };
             req.session.lastUpdated = new Date();
@@ -32,14 +31,5 @@ router.post('/', async function(req, res) {
 
 });
 
-router.get('/logout', function(req, res) {
-    req.session.destroy((err) => {
-        if(err) {
-            console.log("Error destroying session:", err);
-            return res.redirect('/chatroom');
-        }
-        // Redirect to login page after successful logout
-        res.redirect('/login');
-    });
-});
+
 module.exports = router;
