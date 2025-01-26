@@ -40,10 +40,10 @@ router.post('/', async function(req, res, next) {
         }
     }
 })
-router.get('/password', function(req, res, next) {
+router.get('/password', function(req, res) {
     res.render('signup', { title: 'Signup' , startRegistration: true, errorMsg: 'row 49'});
 })
-router.post('/password', async function(req, res, next) {
+router.post('/password', async function(req, res) {
     const email = req.body.email.trim().toLowerCase();
     const result = await users.User.findOne({where: {email: email}});
 
