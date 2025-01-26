@@ -31,14 +31,5 @@ router.post('/', async function(req, res) {
 
 });
 
-router.get('/logout', function(req, res) {
-    req.session.destroy((err) => {
-        if(err) {
-            console.log("Error destroying session:", err);
-            return res.redirect('/chatroom');
-        }
-        // Redirect to login page after successful logout
-        res.redirect('/login');
-    });
-});
+
 module.exports = router;
