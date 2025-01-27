@@ -7,11 +7,10 @@ const DOM = (function() {
 
         document.getElementById('messageForm').addEventListener('submit', addMessage);
 
-
         messageArea.scrollTop = messageArea.scrollHeight;
 
         document.querySelectorAll(".bi-pencil").forEach(button => {
-            button.addEventListener("click", function () {})
+            button.addEventListener("click", editMessage)
         })
 
         document.querySelectorAll(".bi-trash").forEach(button => {
@@ -61,9 +60,19 @@ const DOM = (function() {
     }
 
     async function editMessage(event) {
-        console.log("event activated")
-        if (event.target.classList.contains('bi-pencil')) {
             const messageElement = event.target.closest('.message');
+
+            if(messageElement.querySelector('input')){
+                return;
+            }
+
+            const editHtml = `
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="myInput" value=${}>
+                    <button class="btn btn-success">Save</button>
+                    <button class="btn btn-danger">Discard</button>
+                </div>`
+
             const messageId = messageElement.id;
             //const contentElement = messageElement.querySelector('[name="content"]');
             const contentElement = messageElement.querySelectorAll('p')[1];
@@ -150,7 +159,6 @@ const DOM = (function() {
                 }
             });
 
-        }
     }
 
     async function removeMessage(event) {
