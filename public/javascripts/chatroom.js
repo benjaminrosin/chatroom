@@ -83,8 +83,7 @@ const DOM = (function() {
                 </div>`
 
             const messageId = messageElement.id;
-            //const contentElement = messageElement.querySelector('[name="content"]');
-            const contentElement = messageElement.querySelectorAll('p')[1];
+            const contentElement = messageElement.querySelector('[name="content"]');
             const currentContent = contentElement.textContent;
 
             const originalHTML = contentElement.innerHTML;
@@ -139,13 +138,10 @@ const DOM = (function() {
                         body: JSON.stringify({ messageId: messageId, newContent: newContent})
                     });
 
-                    const responseData = await response.json();
-                    console.log('Server response:', responseData);
-
                     if (!response.ok) {
                         throw new Error('Failed to edit message');
                     }
-                    contentElement.innerHTML = newContent;
+                    contentElement.innerHTML = originalHTML;
                     await update();
                 }
                 catch (error) {
@@ -236,12 +232,21 @@ const DOM = (function() {
                                     <small class="text-muted">${new Date(message.createdAt).toLocaleString()}${edited} </small>
                                     <button class="btn bi bi-trash"></button>
                                     <button class="btn bi bi-pencil"></button>
-                                </p>
-                                <p class="mb-1">${message.content}</p>
-                            </div>
+                                </p>              
+                                <p class="mb-1 msg-display">${message.content}</p>
+                                <div class="input-group mb-3 msg-edit d-none">
+                                    <input type="text" class="form-control">
+                                    <button class="btn btn-success">Save</button>
+                                    <button class="btn btn-danger">Discard</button>
+                                </div>
+                            </div>                           
                             </div>
                         </div>`;
                         msg_area.insertAdjacentHTML('beforeend', newMessage);
+
+                        const newMessageElement = msg_area.lastElementChild;
+                        newMessageElement.querySelector('.bi-pencil').addEventListener('click', editMessage);
+                        newMessageElement.querySelector('.bi-trash').addEventListener('click', removeMessage);
                         //add event listener
                     }
                     else {
