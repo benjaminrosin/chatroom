@@ -65,7 +65,8 @@ const DOM = (function() {
         if (event.target.classList.contains('bi-pencil')) {
             const messageElement = event.target.closest('.message');
             const messageId = messageElement.id;
-            const contentElement = messageElement.querySelector('[name="content"]');
+            //const contentElement = messageElement.querySelector('[name="content"]');
+            const contentElement = messageElement.querySelectorAll('p')[1];
             const currentContent = contentElement.textContent;
 
             const originalHTML = contentElement.innerHTML;
@@ -120,10 +121,13 @@ const DOM = (function() {
                         body: JSON.stringify({ messageId: messageId, newContent: newContent})
                     });
 
+                    const responseData = await response.json();
+                    console.log('Server response:', responseData);
+
                     if (!response.ok) {
                         throw new Error('Failed to edit message');
                     }
-                    contentElement.innerHTML = originalHTML;
+                    contentElement.innerHTML = newContent;
                     await update();
                 }
                 catch (error) {

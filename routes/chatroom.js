@@ -114,6 +114,7 @@ router.put('/edit', async function(req, res) {
         if(!messageToEdit === 0){
             return res.status(404).json({ error: 'the message does not found or cannot be edited' });
         }
+        //req.session.lastUpdate = Date.now()
         res.status(200).json({
             status: 'success'
         })
