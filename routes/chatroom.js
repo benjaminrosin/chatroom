@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 const {User, Message} = require('../models/user');
 //const messages = require('../models/message');
-const {Op} = require("sequelize");
+const {Op, Sequelize} = require("sequelize");
 const {Json} = require("sequelize/lib/utils");
 
 /*
@@ -63,8 +63,31 @@ router.post('/add', async function(req, res, next) {
 
         await Message.create({content: content, user_id: req.session.user.id});
 
+        const newMessages = await Message.findAll({
+            attributes: {
+                include: [
+                    [
+                        Sequelize.literal(`CASE WHEN "user_id" = ${req.session.user.id} THEN true ELSE false END`),
+                        'isMine',
+                    ],
+                ],
+            },
+            include: [{
+                model: User,
+                attributes: ['firstName', 'lastName']
+            }],
+            where: {
+                updatedAt: {
+                    [Op.gt]: req.session.lastUpdate
+                }
+            }
+        });
+
+        req.session.lastUpdate = Date.now()
+
         res.status(200).json({
-            status: 'success'
+            status: 'success',
+            messages: newMessages
         });
     }
     catch(err){
@@ -79,6 +102,14 @@ router.post('/add', async function(req, res, next) {
 router.post('/update', async function(req, res, next) {
     try{
         const newMessages = await Message.findAll({
+            attributes: {
+                include: [
+                    [
+                        Sequelize.literal(`CASE WHEN "user_id" = ${req.session.user.id} THEN true ELSE false END`),
+                        'isMine',
+                    ],
+                ],
+            },
             include: [{
                 model: User,
                 attributes: ['firstName', 'lastName']
@@ -86,9 +117,6 @@ router.post('/update', async function(req, res, next) {
             where: {
                 updatedAt: {
                     [Op.gt]: req.session.lastUpdate
-                },
-                user_id: {
-                    [Op.ne]: req.session.user.id
                 }
             }
         });
