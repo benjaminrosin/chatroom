@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
-const users = require('../models/user');
-const messages = require('../models/message');
+const {User, Message} = require('../models/user');
+//const messages = require('../models/message');
 const {Op} = require("sequelize");
 const {Json} = require("sequelize/lib/utils");
 
@@ -26,16 +26,18 @@ router.get('/',  async function(req, res, next) {
 router.get('/', async function(req, res, next) {
     // load all old messages
     try{
-        const newMessages = await messages.Message.findAll({
+        const newMessages = await Message.findAll({
             include: [{
-                model: users.User,
+                model: User,
                 attributes: ['firstName', 'lastName']
             }]
         });
 
+        console.log(newMessages);
+
         req.session.lastUpdate = Date.now()
 
-        const user = await users.User.findOne({
+        const user = await User.findOne({
             select: ['firstName'],
             where:{id: req.session.user.id}
         });
@@ -59,7 +61,7 @@ router.post('/add', async function(req, res, next) {
     try{
         const content = req.body.message;
 
-        await messages.Message.create({content: content/*, user_id: req.session.user.id*/});
+        await Message.create({content: content, user_id: req.session.user.id});
 
         res.status(200).json({
             status: 'success'
@@ -76,14 +78,14 @@ router.post('/add', async function(req, res, next) {
 
 router.post('/update', async function(req, res, next) {
     try{
-        const newMessages = await messages.Message.findAll({
+        const newMessages = await Message.findAll({
             include: [{
-                model: users.User,
+                model: User,
                 attributes: ['firstName', 'lastName']
             }],
             where: {
                 updatedAt: {
-                    [Op.gte]: req.session.lastUpdate
+                    [Op.gt]: req.session.lastUpdate
                 },
                 user_id: {
                     [Op.ne]: req.session.user.id
@@ -91,12 +93,12 @@ router.post('/update', async function(req, res, next) {
             }
         });
 
+        req.session.lastUpdate = Date.now()
+
         res.status(200).json({
             status: 'success',
             messages: newMessages
         });
-
-        req.session.lastUpdate = Date.now()
     }
     catch(err){
         console.log(err);

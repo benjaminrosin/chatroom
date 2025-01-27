@@ -3,6 +3,7 @@ const sequelize = require('./index');
 const { DataTypes } = require('sequelize');
 const bcrypt = require('bcrypt');
 const {hashSync} = require("bcrypt");
+const Message = require('./message');
 
 const User = sequelize.define('User', {
     email: {
@@ -54,6 +55,14 @@ const User = sequelize.define('User', {
     }
 );
 
+User.hasMany(Message, {
+    foreignKey: 'user_id'
+});
+
+Message.belongsTo(User, {
+    foreignKey: 'user_id'
+});
+
 /*
 Contact.hasMany(Order, {
     foreignKey: 'contact_id'
@@ -63,5 +72,5 @@ Order.belongsTo(Contact, {
     foreignKey: 'contact_id'
 });
 */
-module.exports = { User };
+module.exports = { User, Message};
 

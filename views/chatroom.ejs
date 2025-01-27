@@ -48,7 +48,7 @@
         <% messages.forEach(message => {%>
 
             <div class="message mb-3" id= <%= message.id %> >
-                <p class="mb-1"><strong> <%= message.firstName + ' ' + message.lastName %> </strong> <small class="text-muted"> <%= /*printableDate*/(message.createdAt) %> </small></p>
+                <p class="mb-1"><strong> <%= message.User.firstName + ' ' + message.User.lastName %> </strong> <small class="text-muted"> <%= message.createdAt.toLocaleString() %> </small></p>
                 <p class="mb-1"> <%= message.content %></p>
             </div>
 
