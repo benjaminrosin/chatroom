@@ -103,6 +103,51 @@ router.post('/add', async function(req, res, next) {
         //res.render('signup', {title: 'Signup', startRegistration: true, errorMsg: "cannot signup, please try again later."});
     }
 })
+router.put('/edit', async function(req, res) {
+    try{
+        const { messageId, newContent } = req.body;
+        const userId = req.session.user.id;
+        const messageToEdit= Message.update(
+            {content: newContent},
+            {where: {id: messageId, user_id: userId, updatedAt: Date.now()}});
+
+        if(!messageToEdit === 0){
+            return res.status(404).json({ error: 'the message does not found or cannot be edited' });
+        }
+        res.status(200).json({
+            status: 'success'
+        })
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({
+            status: 'error'
+        });
+    }
+})
+
+router.delete('/delete', async function(req, res) {
+    try {
+        const { messageId } = req.body;
+        const messageToDelete= Message.update(
+            { deleted: true },
+            { where: {id:messageId}
+            });
+
+        if(!messageToDelete === 0){
+            return res.status(404).json({ error: 'the message does not found' });
+        }
+        res.status(200).json({
+            status: 'success'
+        })
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({
+            status: 'error'
+        });
+    }
+})
 
 router.post('/update', async function(req, res, next) {
     try{

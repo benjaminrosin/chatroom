@@ -6,9 +6,14 @@ const DOM = (function() {
 
         document.getElementById('messageForm').addEventListener('submit', addMessage);
 
-        const msg_area = document.getElementById('messageArea');
-        msg_area.scrollTop = msg_area.scrollHeight;
+        const messageArea = document.getElementById('messageArea');
+        messageArea.scrollTop = messageArea.scrollHeight;
 
+        messageArea.addEventListener('click', removeMessage);
+        messageArea.addEventListener('click', editMessage);
+
+
+        //change
 
 
     })
@@ -35,21 +40,6 @@ const DOM = (function() {
                 const {messages} = await response.json();
                 displayMessages(messages);
 
-                /*const newMessage = `
-                        <div class="message mb-3">
-                            <div class="d-flex justify-content-between">
-                            <div>
-                                <p class="mb-1">
-                                    <strong>You</strong>
-                                    <small class="text-muted me-2">${new Date().toLocaleString()}</small>
-                                    <button class="btn bi bi-trash"></button>
-                                    <button class="btn bi bi-pencil"></button>
-                                </p>
-                                <p class="mb-1">${input.value.trim()}</p>
-                            </div>
-                            </div>
-                        </div>`;
-                msg_area.insertAdjacentHTML('beforeend', newMessage);*/
                 input.value = '';
                 err_msg.innerHTML = '';
                 scrollToBottom();
@@ -61,6 +51,120 @@ const DOM = (function() {
         }
     }
 
+    async function editMessage(event) {
+        if (event.target.classList.contains('bi-pencil')) {
+            const messageElement = event.target.closest('.message');
+            const messageId = messageElement.id;
+            const contentElement = messageElement.querySelector('[name="content"]');
+            const currentContent = contentElement.textContent;
+
+            const originalHTML = contentElement.innerHTML;
+
+            const editContainer = document.createElement('div');
+            editContainer.className = 'd-flex flex-column gap-2';
+
+            const editInput = document.createElement('input');
+            editInput.type = 'text';
+            editInput.value = currentContent;
+            editInput.className = 'form-control';
+
+            const buttonsDiv = document.createElement('div');
+            buttonsDiv.className = 'd-flex gap-2';
+
+            const saveButton = document.createElement('button');
+            saveButton.className = 'btn btn-primary btn-sm';
+            saveButton.textContent = 'Save';
+
+            const cancelButton = document.createElement('button');
+            cancelButton.className = 'btn btn-secondary btn-sm';
+            cancelButton.textContent = 'Cancel';
+
+            buttonsDiv.appendChild(saveButton);
+            buttonsDiv.appendChild(cancelButton);
+
+            editContainer.appendChild(editInput);
+            editContainer.appendChild(buttonsDiv);
+
+            contentElement.innerHTML = '';
+            contentElement.appendChild(editContainer);
+            editInput.focus();
+
+            const cancelEdit = () => {
+                contentElement.innerHTML = currentContent;
+            };
+
+            const saveEdit = async () => {
+                const newContent = editInput.value.trim();
+
+                if (!newContent) {
+                    cancelEdit();
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/chatroom/edit`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ messageId: messageId, newContent: newContent})
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to edit message');
+                    }
+                    contentElement.innerHTML = originalHTML;
+                    await update();
+                }
+                catch (error) {
+                    console.error(error);
+                    cancelEdit();
+                }
+            }
+            saveButton.addEventListener('click', saveEdit);
+            cancelButton.addEventListener('click', cancelEdit);
+
+            editInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    saveEdit();
+                }
+            });
+
+            editInput.addEventListener('keyup', function(e) {
+                if (e.key === 'Escape') {
+                    cancelEdit();
+                }
+            });
+
+        }
+    }
+
+    async function removeMessage(event) {
+        if (event.target.classList.contains('bi-trash')){
+            const messageElement = event.target.closest('.message');
+            const messageId = messageElement.id;
+
+            try{
+                const response = await fetch(`/chatroom/delete`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ messageId: messageId })
+                });
+                if (!response.ok) {
+                    throw new Error('Failed to delete message');
+                }
+                else{
+                    messageElement.remove();
+                }
+            }
+            catch (error) {
+                console.error(error);
+            }
+        }
+    }
+
     async function update(){
         const response = await fetch('/chatroom/update', {
             method: 'POST'
@@ -69,22 +173,6 @@ const DOM = (function() {
         if (response.ok) {
             const {messages} = await response.json();
             displayMessages(messages);
-
-            /*const {messages} = await response.json();
-            messages.forEach(message => {
-                if (false /* checking if update or delete *) {
-
-                }
-                else{
-                    const newMessage = `
-                    <div class="message mb-3" id= ${message.id}>
-                        <p class="mb-1"><strong>${message.User.firstName + ' ' + message.User.lastName}</strong> <small class="text-muted">${new Date(message.createdAt).toLocaleString()} </small></p>
-                        <p class="mb-1">${message.content}</p>
-                    </div><div class="message mb-3">
-                    `
-                    msg_area.insertAdjacentHTML('beforeend', newMessage);
-                }
-            })*/
 
         } else {
             throw new Error("cannot refresh");
