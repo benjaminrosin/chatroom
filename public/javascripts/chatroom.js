@@ -2,15 +2,24 @@ const POLLING = 10
 
 const DOM = (function() {
     document.addEventListener("DOMContentLoaded", function () {
+        const messageArea = document.getElementById('messageArea');
         setInterval(update, POLLING*1000);
 
         document.getElementById('messageForm').addEventListener('submit', addMessage);
 
-        const messageArea = document.getElementById('messageArea');
+
         messageArea.scrollTop = messageArea.scrollHeight;
 
-        messageArea.addEventListener('click', removeMessage);
-        messageArea.addEventListener('click', editMessage);
+        document.querySelectorAll(".bi-pencil").forEach(button => {
+            button.addEventListener("click", function () {})
+        })
+
+        document.querySelectorAll(".bi-trash").forEach(button => {
+            button.addEventListener("click", removeMessage)
+        })
+
+        //messageArea.addEventListener('click', removeMessage);
+        //messageArea.addEventListener('click', editMessage);
 
 
         //change
@@ -52,6 +61,7 @@ const DOM = (function() {
     }
 
     async function editMessage(event) {
+        console.log("event activated")
         if (event.target.classList.contains('bi-pencil')) {
             const messageElement = event.target.closest('.message');
             const messageId = messageElement.id;
@@ -140,28 +150,25 @@ const DOM = (function() {
     }
 
     async function removeMessage(event) {
-        if (event.target.classList.contains('bi-trash')){
-            const messageElement = event.target.closest('.message');
-            const messageId = messageElement.id;
+        const messageId = event.target.closest('.message').id;
 
-            try{
-                const response = await fetch(`/chatroom/delete`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ messageId: messageId })
-                });
-                if (!response.ok) {
-                    throw new Error('Failed to delete message');
-                }
-                else{
-                    messageElement.remove();
-                }
+        try {
+            const response = await fetch(`/chatroom/delete`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({messageId: messageId})
+            });
+            if (response.ok) {
+                const {messages} = await response.json();
+                displayMessages(messages);
+
+            } else {
+                throw new Error('Failed to delete message');
             }
-            catch (error) {
-                console.error(error);
-            }
+        } catch (error) {
+            console.error(error);
         }
     }
 

@@ -129,17 +129,41 @@ router.put('/edit', async function(req, res) {
 router.delete('/delete', async function(req, res) {
     try {
         const { messageId } = req.body;
-        const messageToDelete= Message.update(
+        const effectedRows= Message.update(
             { deleted: true },
             { where: {id:messageId}
             });
 
-        if(!messageToDelete === 0){
+        if(effectedRows === 0){
             return res.status(404).json({ error: 'the message does not found' });
         }
+
+        const newMessages = await Message.findAll({
+            attributes: {
+                include: [
+                    [
+                        Sequelize.literal(`CASE WHEN "user_id" = ${req.session.user.id} THEN true ELSE false END`),
+                        'isMine',
+                    ],
+                ],
+            },
+            include: [{
+                model: User,
+                attributes: ['firstName', 'lastName']
+            }],
+            where: {
+                updatedAt: {
+                    [Op.gt]: req.session.lastUpdate
+                }
+            }
+        });
+
+        req.session.lastUpdate = Date.now()
+
         res.status(200).json({
-            status: 'success'
-        })
+            status: 'success',
+            messages: newMessages
+        });
     }
     catch (err) {
         console.log(err);
