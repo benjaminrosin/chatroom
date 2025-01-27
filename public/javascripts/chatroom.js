@@ -61,6 +61,15 @@ const DOM = (function() {
 
     async function editMessage(event) {
             const messageElement = event.target.closest('.message');
+            const displayDiv = messageElement.querySelector('.msg-display');
+            const editDiv = messageElement.querySelector('.msg-edit');
+
+            editDiv.getElementsByTagName('input')[0].value = displayDiv.innerHTML;
+
+            displayDiv.classList.toggle("d-none");
+            editDiv.classList.toggle("d-none");
+
+            /*const message = messageElement.querySelectorAll('p')[1].innerHTML;
 
             if(messageElement.querySelector('input')){
                 return;
@@ -157,7 +166,7 @@ const DOM = (function() {
                 if (e.key === 'Escape') {
                     cancelEdit();
                 }
-            });
+            });*/
 
     }
 

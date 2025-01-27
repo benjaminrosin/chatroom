@@ -58,7 +58,12 @@
                                 <button class="btn bi bi-trash"></button>
                                 <button class="btn bi bi-pencil"></button>
                             </p>
-                            <p class="mb-1"><%= message.content %></p>
+                            <p class="mb-1 msg-display"><%= message.content %></p>
+                            <div class="input-group mb-3 msg-edit d-none">
+                                <input type="text" class="form-control" id="myInput">
+                                <button class="btn btn-success">Save</button>
+                                <button class="btn btn-danger">Discard</button>
+                            </div>
                         </div>
                     </div>
                 </div>
