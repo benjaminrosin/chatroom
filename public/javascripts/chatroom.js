@@ -6,7 +6,9 @@ const DOM = (function() {
 
         document.getElementById('messageForm').addEventListener('submit', addMessage);
 
-        //change
+        const msg_area = document.getElementById('messageArea');
+        msg_area.scrollTop = msg_area.scrollHeight;
+
 
 
     })
@@ -50,6 +52,7 @@ const DOM = (function() {
                 msg_area.insertAdjacentHTML('beforeend', newMessage);*/
                 input.value = '';
                 err_msg.innerHTML = '';
+                scrollToBottom();
             } else {
                 throw new Error("cannot add message");
             }
@@ -118,7 +121,7 @@ const DOM = (function() {
                                     <button class="btn bi bi-trash"></button>
                                     <button class="btn bi bi-pencil"></button>
                                 </p>
-                                <p class="mb-1" name="content">${message.content}</p>
+                                <p class="mb-1">${message.content}</p>
                             </div>
                             </div>
                         </div>`;
@@ -137,6 +140,12 @@ const DOM = (function() {
             }
 
         })
+
+    }
+
+    function scrollToBottom() {
+        const messageArea = document.getElementById('messageArea');
+        messageArea.scrollTop = messageArea.scrollHeight;
     }
 
     return{};
