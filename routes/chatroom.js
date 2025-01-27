@@ -46,6 +46,8 @@ router.get('/', async function(req, res, next) {
     }
     catch(err){
         console.log(err);
+        next(err);
+        //return res.redirect('/login');
         //res.redirect('/');
     }
 
