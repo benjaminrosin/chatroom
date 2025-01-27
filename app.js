@@ -54,6 +54,18 @@ app.get('/logout', function(req, res) {
   });
 });
 
+const authMiddleware = function (req, res, next) {
+  if (!req.session.user || !req.session.user.isLoggedIn) {
+    return res.redirect('/login');
+  }
+  next();
+}
+
+app.get('/', authMiddleware, function(req, res) {
+  return res.redirect('/chatroom');
+});
+
+/*
 app.get('/', function(req, res, next) {
   if (!req.session.user || !req.session.user.isLoggedIn) {
     return res.redirect('/login');
@@ -61,10 +73,12 @@ app.get('/', function(req, res, next) {
   return res.redirect('/chatroom');
   //next();
 });
-
+*/
 app.use('/login', loginRouter);
 app.use('/signup', signupRouter);
-app.use('/chatroom', chatRouter);
+app.use('/chatroom', authMiddleware, chatRouter);
+
+//app.use('/chatroom', chatRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
