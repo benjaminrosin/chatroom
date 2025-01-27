@@ -87,7 +87,7 @@ const DOM = (function() {
             editInput.focus();
 
             const cancelEdit = () => {
-                contentElement.innerHTML = currentContent;
+                contentElement.innerHTML = originalHTML;
             };
 
             const saveEdit = async () => {
