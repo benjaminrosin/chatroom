@@ -30,19 +30,22 @@ router.get('/', async function(req, res, next) {
             include: [{
                 model: User,
                 attributes: ['firstName', 'lastName']
+            }],
+            where: [{
+                deleted: false
             }]
         });
 
         console.log(newMessages);
 
-        req.session.lastUpdate = Date.now()
+        req.session.lastUpdate = Date.now();
 
         const user = await User.findOne({
             select: ['firstName'],
             where:{id: req.session.user.id}
         });
 
-        res.render('chatroom', { title: 'Chat', firstName: user.firstName, messages: newMessages });
+        res.render('chatroom', { title: 'Chat', firstName: user.firstName, messages: newMessages, user_id: req.session.user.id });
     }
     catch(err){
         console.log(err);

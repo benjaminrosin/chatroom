@@ -10,6 +10,8 @@
 <body>
 <!-- Navbar -->
 
+<input type="hidden" id="user-id" value="<%= user_id %>">
+
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
         <a class="navbar-brand" href="#">
@@ -45,16 +47,32 @@
 <div class="container mt-4">
     <div class="message-area border rounded p-3" id="messageArea" style="height: 60vh; overflow-y: auto;">
         <!-- Example message (from others) -->
-        <% messages.forEach(message => {%>
+        <% messages.forEach(message =>{
+            if(message.user_id === user_id){%>
+                <div class="message mb-3"  id= <%= message.id %>>
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <p class="mb-1">
+                                <strong>You</strong>
+                                <small class="text-muted"><%= message.createdAt.toLocaleString()%> <%= (message.createdAt.toString()===message.updatedAt.toString())?``:`, edited`%> </small>
+                                <button class="btn bi bi-trash"></button>
+                                <button class="btn bi bi-pencil"></button>
+                            </p>
+                            <p class="mb-1"><%= message.content %></p>
+                        </div>
+                    </div>
+                </div>
+            <%}
+            else{%>
+                <div class="message mb-3" id= <%= message.id %> >
+                    <p class="mb-1">
+                        <strong> <%= message.User.firstName + ' ' + message.User.lastName %> </strong>
+                        <small class="text-muted"> <%= message.createdAt.toLocaleString() %> <%= (message.createdAt.toString()===message.updatedAt.toString())?``:`, edited`%></small></p>
+                    <p class="mb-1"> <%= message.content %></p>
+                </div>
+        <% }}); %>
 
-            <div class="message mb-3" id= <%= message.id %> >
-                <p class="mb-1"><strong> <%= message.User.firstName + ' ' + message.User.lastName %> </strong> <small class="text-muted"> <%= message.createdAt.toLocaleString() %> </small></p>
-                <p class="mb-1"> <%= message.content %></p>
-            </div>
-
-        <% }); %>
-
-
+<!--
         <div class="message mb-3">
             <p class="mb-1"><strong>John Doe</strong> <small class="text-muted">2025-01-26 12:34 PM</small></p>
             <p class="mb-1">This is a sample message from another user.</p>
@@ -62,7 +80,7 @@
 
 
 
-        <!-- Example message (from me) -->
+        < !-- Example message (from me) -- >
         <div class="message mb-3">
             <div class="d-flex justify-content-between">
                 <div>
@@ -105,6 +123,7 @@
                 </div>
             </div>
         </div>
+-->
     </div>
 
     <!-- Message input form -->
