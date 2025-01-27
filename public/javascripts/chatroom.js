@@ -17,6 +17,14 @@ const DOM = (function() {
             button.addEventListener("click", removeMessage)
         })
 
+        /*document.querySelectorAll(".bi-floppy-fill").forEach(button => {
+            button.addEventListener("click", saveEdit)
+        })*/
+
+        document.querySelectorAll(".bi-x-circle").forEach(button => {
+            button.addEventListener("click", editMessage)
+        })
+
         //messageArea.addEventListener('click', removeMessage);
         //messageArea.addEventListener('click', editMessage);
 
@@ -25,6 +33,17 @@ const DOM = (function() {
 
 
     })
+
+    /*function cancelEdit(event){
+        const messageElement = event.target.closest('.message');
+        const displayDiv = messageElement.querySelector('.msg-display');
+        const editDiv = messageElement.querySelector('.msg-edit');
+
+        editDiv.getElementsByTagName('input')[0].value = '';
+
+        displayDiv.classList.toggle("d-none");
+        editDiv.classList.toggle("d-none");
+    }*/
 
     async function addMessage(event) {
         event.preventDefault();
@@ -236,8 +255,8 @@ const DOM = (function() {
                                 <p class="mb-1 msg-display">${message.content}</p>
                                 <div class="input-group mb-3 msg-edit d-none">
                                     <input type="text" class="form-control">
-                                    <button class="btn btn-success">Save</button>
-                                    <button class="btn btn-danger">Discard</button>
+                                    <button class="btn bi bi-floppy-fill"></button>
+                                    <button class="btn bi bi-x-circle"></button>
                                 </div>
                             </div>                           
                             </div>
@@ -247,6 +266,7 @@ const DOM = (function() {
                         const newMessageElement = msg_area.lastElementChild;
                         newMessageElement.querySelector('.bi-pencil').addEventListener('click', editMessage);
                         newMessageElement.querySelector('.bi-trash').addEventListener('click', removeMessage);
+                        newMessageElement.querySelector('.bi-x-circle').addEventListener('click', editMessage);
                         //add event listener
                     }
                     else {
