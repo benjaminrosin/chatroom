@@ -103,21 +103,44 @@ router.post('/add', async function(req, res, next) {
         //res.render('signup', {title: 'Signup', startRegistration: true, errorMsg: "cannot signup, please try again later."});
     }
 })
-router.put('/edit', async function(req, res) {
+router.post('/edit', async function(req, res) {
     try{
         const { messageId, newContent } = req.body;
         const userId = req.session.user.id;
-        const messageToEdit= Message.update(
+        const messageToEdit= await Message.update(
             {content: newContent},
-            {where: {id: messageId, user_id: userId, updatedAt: Date.now()}});
+            {where: {id: messageId, user_id: userId}}
+        );
 
         if(!messageToEdit === 0){
             return res.status(404).json({ error: 'the message does not found or cannot be edited' });
         }
-        //req.session.lastUpdate = Date.now()
+        const newMessages = await Message.findAll({
+            attributes: {
+                include: [
+                    [
+                        Sequelize.literal(`CASE WHEN "user_id" = ${req.session.user.id} THEN true ELSE false END`),
+                        'isMine',
+                    ],
+                ],
+            },
+            include: [{
+                model: User,
+                attributes: ['firstName', 'lastName']
+            }],
+            where: {
+                updatedAt: {
+                    [Op.gt]: req.session.lastUpdate
+                }
+            }
+        });
+
+        req.session.lastUpdate = Date.now()
+
         res.status(200).json({
-            status: 'success'
-        })
+            status: 'success',
+            messages: newMessages
+        });
     }
     catch (err) {
         console.log(err);
