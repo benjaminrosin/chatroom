@@ -1,67 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const users = require('../models/user');
-const REGISTER = 30;
-
+const validator = require('../controllers/validationController')
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
-    res.render('signup', { title: 'Signup' , startRegistration: true, errorMsg: ''});
-});
+router.get('/', validator.newSignup)
 
-router.post('/', async function(req, res, next) {
-    if(!req.cookies.registerData){
-        res.render('signup', { title: 'Signup' , startRegistration: true , errorMsg: 'session expired, please try again' });
-    }
-    else {
-        try {
-            const registerData = JSON.parse(req.cookies.registerData);
+router.post('/', validator.register)
 
-            const email = registerData.email.trim().toLowerCase();
-            const fName = registerData.firstName.trim().toLowerCase();
-            const lName = registerData.lastName.trim().toLowerCase();
-            const password = req.body.password.trim().toLowerCase();
+router.get('/password', validator.newSignup)
 
-            res.clearCookie('registerData');
-            await users.User.create({email: email, firstName: fName, lastName: lName, password: password});
-
-            res.render('login', {title: 'Login', msg: 'you are now registered', errMsg: ''});
-        }
-        catch(err) {
-            if (Array.isArray(err)) {
-                console.log(err.errors[0]);
-                res.render('signup', {title: 'Signup', startRegistration: true, errorMsg: err.errors[0].message});
-            }
-            else{
-                console.log(err);
-                res.render('signup', {title: 'Signup', startRegistration: true, errorMsg: "cannot signup, please try again later."});
-            }
-        }
-    }
-})
-router.get('/password', function(req, res) {
-    res.render('signup', { title: 'Signup' , startRegistration: true, errorMsg: 'row 49'});
-})
-router.post('/password', async function(req, res) {
-    const email = req.body.email.trim().toLowerCase();
-    const result = await users.User.findOne({where: {email: email}});
-
-    if(!result){
-        res.cookie('registerData',
-            JSON.stringify({
-                email: email,
-                firstName: req.body.first_name.trim().toLowerCase(),
-                lastName: req.body.last_name.trim().toLowerCase()
-            }),
-            {
-                maxAge: 1000 * REGISTER, // Set cookie expiration
-            }
-        );
-        res.render('signup', { title: 'Signup' , startRegistration: false, errorMsg: ''});
-    }
-    else{
-        res.render('signup', { title: 'Signup' , startRegistration: true , errorMsg: 'Email already in use'});
-    }
-})
+router.post('/password', validator.checkEmailAvailability);
 
 module.exports = router;

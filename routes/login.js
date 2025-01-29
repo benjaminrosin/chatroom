@@ -1,35 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const users = require('../models/user');
-const bcrypt = require("bcrypt");
+const validator = require('../controllers/validationController')
 
-/* GET home page. */
-router.get('/', function(req, res) {
-    res.render('login', { title: 'Login', msg: '', errMsg: ''});
-});
+router.get('/', validator.newLogin);
 
-router.post('/', async function(req, res) {
-    const user = await users.User.findOne({where:{email: req.body.email.trim().toLowerCase()}});
-
-    if (user){
-        const match = await bcrypt.compare(req.body.password, user.password);
-        if (match) {
-            req.session.user = {
-                id: user.id,
-                isLoggedIn: true
-            };
-            req.session.lastUpdated = new Date();
-            res.redirect('chatroom');
-        }
-        else{
-            res.render('login', { title: 'Login', msg: '', errMsg: "wrong password"});
-        }
-    }
-    else{
-        res.render('login', { title: 'Login', msg: '', errMsg: "cannot find user"});
-    }
-
-});
-
+router.post('/', validator.loginValidation);
 
 module.exports = router;

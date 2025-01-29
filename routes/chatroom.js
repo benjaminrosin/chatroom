@@ -1,238 +1,25 @@
 var express = require('express');
 var router = express.Router();
-const {User, Message} = require('../models/user');
-//const messages = require('../models/message');
-const {Op, Sequelize} = require("sequelize");
-const {Json} = require("sequelize/lib/utils");
-
-/*
-router.get('/',  async function(req, res, next) {
-    if (!req.session.user || !req.session.user.isLoggedIn) {
-        return res.redirect('/logout');
-    }
-    const user = await users.User.findOne({
-        select: ['firstName'],
-        where:{id: req.session.user.id}
-    });
-
-    res.render('chatroom', {
-        title: 'Chat',
-        firstName: user.firstName
-    });
-});
-
- */
-
-router.get('/', async function(req, res, next) {
-    // load all old messages
-    try{
-        const newMessages = await Message.findAll({
-            include: [{
-                model: User,
-                attributes: ['firstName', 'lastName']
-            }],
-            where: [{
-                deleted: false
-            }]
-        });
-
-        console.log(newMessages);
-
-        req.session.lastUpdate = Date.now();
-
-        const user = await User.findOne({
-            select: ['firstName'],
-            where:{id: req.session.user.id}
-        });
-
-        res.render('chatroom', { title: 'Chat', firstName: user.firstName, messages: newMessages, user_id: req.session.user.id });
-    }
-    catch(err){
-        console.log(err);
-        next(err);
-        //return res.redirect('/login');
-        //res.redirect('/');
-    }
+const messageController = require('../controllers/messageHandler')
 
 
-    //res.render('chatroom', { title: 'Chat'});
-});
+router.get('/', messageController.getchat)
 
-router.get('/add', function(req, res, next) {
-    res.redirect('/chatroom');
-})
+router.get('/add', messageController.unexpected)
 
-router.post('/add', async function(req, res, next) {
-    try{
-        const content = req.body.message;
+router.post('/add', messageController.addMsg)
 
-        await Message.create({content: content, user_id: req.session.user.id});
+router.get('/edit', messageController.unexpected)
 
-        const newMessages = await Message.findAll({
-            attributes: {
-                include: [
-                    [
-                        Sequelize.literal(`CASE WHEN "user_id" = ${req.session.user.id} THEN true ELSE false END`),
-                        'isMine',
-                    ],
-                ],
-            },
-            include: [{
-                model: User,
-                attributes: ['firstName', 'lastName']
-            }],
-            where: {
-                updatedAt: {
-                    [Op.gt]: req.session.lastUpdate
-                }
-            }
-        });
+router.post('/edit', messageController.editMsg)
 
-        req.session.lastUpdate = Date.now()
+router.get('/delete', messageController.unexpected)
 
-        res.status(200).json({
-            status: 'success',
-            messages: newMessages
-        });
-    }
-    catch(err){
-        console.log(err);
-        res.status(500).json({
-            status: 'error'
-        });
-        //res.render('signup', {title: 'Signup', startRegistration: true, errorMsg: "cannot signup, please try again later."});
-    }
-})
-router.post('/edit', async function(req, res) {
-    try{
-        const { messageId, newContent } = req.body;
-        const userId = req.session.user.id;
-        const messageToEdit= await Message.update(
-            {content: newContent},
-            {where: {id: messageId, user_id: userId}}
-        );
+router.delete('/delete', messageController.deleteMsg)
 
-        if(!messageToEdit === 0){
-            return res.status(404).json({ error: 'the message does not found or cannot be edited' });
-        }
-        const newMessages = await Message.findAll({
-            attributes: {
-                include: [
-                    [
-                        Sequelize.literal(`CASE WHEN "user_id" = ${req.session.user.id} THEN true ELSE false END`),
-                        'isMine',
-                    ],
-                ],
-            },
-            include: [{
-                model: User,
-                attributes: ['firstName', 'lastName']
-            }],
-            where: {
-                updatedAt: {
-                    [Op.gt]: req.session.lastUpdate
-                }
-            }
-        });
+router.get('/update', messageController.unexpected)
 
-        req.session.lastUpdate = Date.now()
-
-        res.status(200).json({
-            status: 'success',
-            messages: newMessages
-        });
-    }
-    catch (err) {
-        console.log(err);
-        res.status(500).json({
-            status: 'error'
-        });
-    }
-})
-
-router.delete('/delete', async function(req, res) {
-    try {
-        const { messageId } = req.body;
-        const effectedRows= Message.update(
-            { deleted: true },
-            { where: {id:messageId}
-            });
-
-        if(effectedRows === 0){
-            return res.status(404).json({ error: 'the message does not found' });
-        }
-
-        const newMessages = await Message.findAll({
-            attributes: {
-                include: [
-                    [
-                        Sequelize.literal(`CASE WHEN "user_id" = ${req.session.user.id} THEN true ELSE false END`),
-                        'isMine',
-                    ],
-                ],
-            },
-            include: [{
-                model: User,
-                attributes: ['firstName', 'lastName']
-            }],
-            where: {
-                updatedAt: {
-                    [Op.gt]: req.session.lastUpdate
-                }
-            }
-        });
-
-        req.session.lastUpdate = Date.now()
-
-        res.status(200).json({
-            status: 'success',
-            messages: newMessages
-        });
-    }
-    catch (err) {
-        console.log(err);
-        res.status(500).json({
-            status: 'error'
-        });
-    }
-})
-
-router.post('/update', async function(req, res, next) {
-    try{
-        const newMessages = await Message.findAll({
-            attributes: {
-                include: [
-                    [
-                        Sequelize.literal(`CASE WHEN "user_id" = ${req.session.user.id} THEN true ELSE false END`),
-                        'isMine',
-                    ],
-                ],
-            },
-            include: [{
-                model: User,
-                attributes: ['firstName', 'lastName']
-            }],
-            where: {
-                updatedAt: {
-                    [Op.gt]: req.session.lastUpdate
-                }
-            }
-        });
-
-        req.session.lastUpdate = Date.now()
-
-        res.status(200).json({
-            status: 'success',
-            messages: newMessages
-        });
-    }
-    catch(err){
-        console.log(err);
-        res.status(500).json({
-            status: 'error'
-        });
-    }
-})
+router.post('/update', messageController.update)
 
 
 module.exports = router;
