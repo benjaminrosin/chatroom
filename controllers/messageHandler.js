@@ -119,7 +119,9 @@ async function update(req, res) {
             }],
             where: {
                 updatedAt: {
-                    [Op.gt]: req.body.last_updated
+                    //[Op.gt]: req.body.last_updated
+                    [Op.gt]: new Date(req.body.last_updated)
+
                 }
             }
         });

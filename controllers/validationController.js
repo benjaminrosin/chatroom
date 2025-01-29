@@ -17,7 +17,7 @@ exports.loginValidation = async(req, res) => {
                 id: user.id,
                 isLoggedIn: true
             };
-            req.session.lastUpdated = new Date();
+            //req.session.lastUpdated = new Date();
             res.redirect('chatroom');
         }
         else{

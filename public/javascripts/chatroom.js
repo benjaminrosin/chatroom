@@ -42,7 +42,7 @@ const DOM = (function() {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ message: message, last_updated: last_updated })
+                body: JSON.stringify({ message: message, last_updated: new Date(last_updated).toISOString() })
             });
 
             if (response.redirected) {
@@ -103,7 +103,7 @@ const DOM = (function() {
                 body: JSON.stringify(
                     {messageId: messageId,
                         newContent: newMessage,
-                        lastUpdated: last_updated})
+                        last_updated: new Date(last_updated).toISOString()})
             });
 
             if (response.redirected) {
@@ -136,7 +136,7 @@ const DOM = (function() {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({messageId: messageId, last_updated: last_updated})
+                body: JSON.stringify({messageId: messageId, last_updated: new Date(last_updated).toISOString()})
             });
             if (response.redirected) {
                 window.location.href = response.url;
@@ -161,7 +161,10 @@ const DOM = (function() {
     async function update(){
         const response = await fetch('/chatroom/update', {
             method: 'POST',
-            body: JSON.stringify({last_updated: last_updated})
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({last_updated: new Date(last_updated).toISOString()})
         });
 
         if (response.redirected) {
