@@ -14,7 +14,8 @@ exports.getchat = async (req, res) => {
             }]
         });
 
-        req.session.lastUpdate = Date.now();
+        //req.session.lastUpdate = Date.now();
+        //req.body.lastUpdate = Date.now();
 
         const user = await User.findOne({
             select: ['firstName'],
@@ -118,12 +119,13 @@ async function update(req, res) {
             }],
             where: {
                 updatedAt: {
-                    [Op.gt]: req.session.lastUpdate
+                    [Op.gt]: req.body.last_updated
                 }
             }
         });
 
-        req.session.lastUpdate = Date.now()
+        //req.session.lastUpdate = Date.now()
+        //req.body.lastUpdate = Date.now();
 
         res.status(200).json({
             status: 'success',

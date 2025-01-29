@@ -42,19 +42,24 @@ const DOM = (function() {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ message: message })
+                body: JSON.stringify({ message: message, last_updated: last_updated })
             });
 
-            if (response.ok) {
+            if (response.redirected) {
+                window.location.href = response.url;
+                return;
+            }
+            else if (response.ok) {
+                last_updated = Date.now();
                 const {messages} = await response.json();
                 displayMessages(messages);
 
                 input.value = '';
                 err_msg.innerHTML = '';
                 scrollToBottom();
-            } else if(response.status === 401 || response.status === 403) {
+            } /*else if(response.status === 401 || response.status === 403) {
                 window.location.href = '/login';
-            }
+            }*/
             else {
                 throw new Error("cannot add message");
             }
@@ -100,18 +105,20 @@ const DOM = (function() {
                         newContent: newMessage,
                         lastUpdated: last_updated})
             });
-            if (response.ok) {
+
+            if (response.redirected) {
+                window.location.href = response.url;
+                return;
+            }
+            else if (response.ok) {
+                last_updated = Date.now();
                 const {messages} = await response.json();
                 displayMessages(messages);
                 editMessageMode(event);
             }
-            else if (response.redirected) {
-                window.location.href = response.url;
-                //return;
-            }
-            else if(response.status === 401 || response.status === 403) {
+            /*else if(response.status === 401 || response.status === 403) {
                 window.location.href = '/login';
-            }
+            }*/
             else {
                 throw new Error('Failed to delete message');
             }
@@ -129,15 +136,20 @@ const DOM = (function() {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({messageId: messageId})
+                body: JSON.stringify({messageId: messageId, last_updated: last_updated})
             });
-            if (response.ok) {
+            if (response.redirected) {
+                window.location.href = response.url;
+                return;
+            }
+            else if (response.ok) {
+                last_updated = Date.now();
                 const {messages} = await response.json();
                 displayMessages(messages);
 
-            } else if(response.status === 401 || response.status === 403) {
+            } /*else if(response.status === 401 || response.status === 403) {
                 window.location.href = '/login';
-            }
+            }*/
             else {
                 throw new Error('Failed to delete message');
             }
@@ -148,18 +160,16 @@ const DOM = (function() {
 
     async function update(){
         const response = await fetch('/chatroom/update', {
-            method: 'POST'
+            method: 'POST',
+            body: JSON.stringify({last_updated: last_updated})
         });
 
         if (response.redirected) {
             window.location.href = response.url;
             return;
         }
-        /*else if(response.status === 401 || response.status === 403) {
-            window.location.href = '/login';
-            return;
-        }*/
         else if (response.ok) {
+            last_updated = Date.now();
             const {messages} = await response.json();
             displayMessages(messages);
         }

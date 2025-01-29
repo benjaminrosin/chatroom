@@ -41,7 +41,7 @@ app.use(session({
   saveUninitialized: false,
   //lastUpdated: new Date(),
   rolling: false,
-  cookie: {maxAge:60 * 1000} // 1 minute
+  cookie: {maxAge: 60* 60 * 1000} // 1 minute
 }));
 
 app.get('/logout', function(req, res) {
