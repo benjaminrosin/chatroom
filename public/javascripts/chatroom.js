@@ -24,26 +24,7 @@ const DOM = (function() {
         document.querySelectorAll(".bi-x-circle").forEach(button => {
             button.addEventListener("click", editMessageMode)
         })
-
-        //messageArea.addEventListener('click', removeMessage);
-        //messageArea.addEventListener('click', editMessage);
-
-
-        //change
-
-
     })
-
-    /*function cancelEdit(event){
-        const messageElement = event.target.closest('.message');
-        const displayDiv = messageElement.querySelector('.msg-display');
-        const editDiv = messageElement.querySelector('.msg-edit');
-
-        editDiv.getElementsByTagName('input')[0].value = '';
-
-        displayDiv.classList.toggle("d-none");
-        editDiv.classList.toggle("d-none");
-    }*/
 
     async function addMessage(event) {
         event.preventDefault();
@@ -70,7 +51,10 @@ const DOM = (function() {
                 input.value = '';
                 err_msg.innerHTML = '';
                 scrollToBottom();
-            } else {
+            } else if(response.status === 401 || response.status === 403) {
+                window.location.href = '/login';
+            }
+            else {
                 throw new Error("cannot add message");
             }
         } catch (error) {
@@ -87,102 +71,6 @@ const DOM = (function() {
 
         displayDiv.classList.toggle("d-none");
         editDiv.classList.toggle("d-none");
-
-            /*const message = messageElement.querySelectorAll('p')[1].innerHTML;
-
-            if(messageElement.querySelector('input')){
-                return;
-            }
-
-            const editHtml = `
-                <div class="input-group mb-3">
-                    <input type="text" class="form-control" id="myInput" value=${}>
-                    <button class="btn btn-success">Save</button>
-                    <button class="btn btn-danger">Discard</button>
-                </div>`
-
-            const messageId = messageElement.id;
-            const contentElement = messageElement.querySelector('[name="content"]');
-            const currentContent = contentElement.textContent;
-
-            const originalHTML = contentElement.innerHTML;
-
-            const editContainer = document.createElement('div');
-            editContainer.className = 'd-flex flex-column gap-2';
-
-            const editInput = document.createElement('input');
-            editInput.type = 'text';
-            editInput.value = currentContent;
-            editInput.className = 'form-control';
-
-            const buttonsDiv = document.createElement('div');
-            buttonsDiv.className = 'd-flex gap-2';
-
-            const saveButton = document.createElement('button');
-            saveButton.className = 'btn btn-primary btn-sm';
-            saveButton.textContent = 'Save';
-
-            const cancelButton = document.createElement('button');
-            cancelButton.className = 'btn btn-secondary btn-sm';
-            cancelButton.textContent = 'Cancel';
-
-            buttonsDiv.appendChild(saveButton);
-            buttonsDiv.appendChild(cancelButton);
-
-            editContainer.appendChild(editInput);
-            editContainer.appendChild(buttonsDiv);
-
-            contentElement.innerHTML = '';
-            contentElement.appendChild(editContainer);
-            editInput.focus();
-
-            const cancelEdit = () => {
-                contentElement.innerHTML = originalHTML;
-            };
-
-            const saveEdit = async () => {
-                const newContent = editInput.value.trim();
-
-                if (!newContent) {
-                    cancelEdit();
-                    return;
-                }
-
-                try {
-                    const response = await fetch(`/chatroom/edit`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ messageId: messageId, newContent: newContent})
-                    });
-
-                    if (!response.ok) {
-                        throw new Error('Failed to edit message');
-                    }
-                    contentElement.innerHTML = originalHTML;
-                    await update();
-                }
-                catch (error) {
-                    console.error(error);
-                    cancelEdit();
-                }
-            }
-            saveButton.addEventListener('click', saveEdit);
-            cancelButton.addEventListener('click', cancelEdit);
-
-            editInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    saveEdit();
-                }
-            });
-
-            editInput.addEventListener('keyup', function(e) {
-                if (e.key === 'Escape') {
-                    cancelEdit();
-                }
-            });*/
-
     }
 
     async function editMessage(event) {
@@ -214,7 +102,15 @@ const DOM = (function() {
                 const {messages} = await response.json();
                 displayMessages(messages);
                 editMessageMode(event);
-            } else {
+            }
+            else if (response.redirected) {
+                window.location.href = response.url;
+                //return;
+            }
+            else if(response.status === 401 || response.status === 403) {
+                window.location.href = '/login';
+            }
+            else {
                 throw new Error('Failed to delete message');
             }
         } catch (error) {
@@ -237,7 +133,10 @@ const DOM = (function() {
                 const {messages} = await response.json();
                 displayMessages(messages);
 
-            } else {
+            } else if(response.status === 401 || response.status === 403) {
+                window.location.href = '/login';
+            }
+            else {
                 throw new Error('Failed to delete message');
             }
         } catch (error) {
@@ -250,14 +149,44 @@ const DOM = (function() {
             method: 'POST'
         });
 
+        if (response.redirected) {
+            window.location.href = response.url;
+            return;
+        }
+        /*else if(response.status === 401 || response.status === 403) {
+            window.location.href = '/login';
+            return;
+        }*/
+        else if (response.ok) {
+            const {messages} = await response.json();
+            displayMessages(messages);
+        }
+        else {
+            throw new Error("cannot refresh");
+        }
+    }
+
+    /*async function update(){
+        const response = await fetch('/chatroom/update', {
+            method: 'POST'
+        });
+
         if (response.ok) {
             const {messages} = await response.json();
             displayMessages(messages);
 
-        } else {
+        } else if (response.redirected) {
+            window.location.href = response.url;
+            return;
+        }
+        else if(response.status === 401 || response.status === 403) {
+            window.location.href = '/login';
+            return;
+        }
+        else {
             throw new Error("cannot refresh");
         }
-    }
+    }*/
 
     function displayMessages(messages){
         const msg_area = document.getElementById('messageArea');
@@ -326,6 +255,7 @@ const DOM = (function() {
         const messageArea = document.getElementById('messageArea');
         messageArea.scrollTop = messageArea.scrollHeight;
     }
+
 
     return{};
 }());

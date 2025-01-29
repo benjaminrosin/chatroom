@@ -39,8 +39,9 @@ app.use(session({
   secret: 'secretSessionId',
   resave: false,
   saveUninitialized: false,
-  lastUpdated: new Date(),
-  cookie: {maxAge:60 * 60 * 1000} // 1 hour
+  //lastUpdated: new Date(),
+  rolling: false,
+  cookie: {maxAge:60 * 1000} // 1 minute
 }));
 
 app.get('/logout', function(req, res) {
