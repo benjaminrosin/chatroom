@@ -1,4 +1,5 @@
 const POLLING = 10
+let last_updated = new Date(-8640000000000000);
 
 const DOM = (function() {
     document.addEventListener("DOMContentLoaded", function () {
@@ -96,7 +97,8 @@ const DOM = (function() {
                 },
                 body: JSON.stringify(
                     {messageId: messageId,
-                        newContent: newMessage})
+                        newContent: newMessage,
+                        lastUpdated: last_updated})
             });
             if (response.ok) {
                 const {messages} = await response.json();
