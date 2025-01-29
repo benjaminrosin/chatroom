@@ -4,6 +4,8 @@ const {User, Message} = require('../models/user');
 //const messages = require('../models/message');
 const {Op, Sequelize} = require("sequelize");
 const {Json} = require("sequelize/lib/utils");
+let lastChatUpdate = Date.now();
+
 
 /*
 router.get('/',  async function(req, res, next) {
@@ -38,7 +40,8 @@ router.get('/', async function(req, res, next) {
 
         console.log(newMessages);
 
-        req.session.lastUpdate = Date.now();
+        lastChatUpdate = Date.now();
+        //req.session.lastUpdate = Date.now();
 
         const user = await User.findOne({
             select: ['firstName'],
@@ -83,12 +86,14 @@ router.post('/add', async function(req, res, next) {
             }],
             where: {
                 updatedAt: {
-                    [Op.gt]: req.session.lastUpdate
+                    //[Op.gt]: req.session.lastUpdate
+                    //[Op.gt]: lastChatUpdate
                 }
             }
         });
 
-        req.session.lastUpdate = Date.now()
+        //req.session.lastUpdate = Date.now()
+        lastChatUpdate = Date.now();
 
         res.status(200).json({
             status: 'success',
@@ -130,12 +135,14 @@ router.post('/edit', async function(req, res) {
             }],
             where: {
                 updatedAt: {
-                    [Op.gt]: req.session.lastUpdate
+                   // [Op.gt]: req.session.lastUpdate
+                    [Op.gt]: lastChatUpdate
                 }
             }
         });
 
-        req.session.lastUpdate = Date.now()
+        //req.session.lastUpdate = Date.now()
+        lastChatUpdate = Date.now();
 
         res.status(200).json({
             status: 'success',
@@ -177,12 +184,14 @@ router.delete('/delete', async function(req, res) {
             }],
             where: {
                 updatedAt: {
-                    [Op.gt]: req.session.lastUpdate
+                    //[Op.gt]: req.session.lastUpdate
+                    [Op.gt]: lastChatUpdate
                 }
             }
         });
 
-        req.session.lastUpdate = Date.now()
+        //req.session.lastUpdate = Date.now()
+        lastChatUpdate = Date.now();
 
         res.status(200).json({
             status: 'success',
@@ -214,12 +223,14 @@ router.post('/update', async function(req, res, next) {
             }],
             where: {
                 updatedAt: {
-                    [Op.gt]: req.session.lastUpdate
+                    //[Op.gt]: req.session.lastUpdate
+                    [Op.gt]: lastChatUpdate
                 }
             }
         });
 
-        req.session.lastUpdate = Date.now()
+        //req.session.lastUpdate = Date.now()
+        lastChatUpdate = Date.now();
 
         res.status(200).json({
             status: 'success',
