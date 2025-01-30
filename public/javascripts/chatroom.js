@@ -1,14 +1,19 @@
 const POLLING = 10
 let last_updated = new Date(-8640000000000000);
+let intervalId = null;
 
 const DOM = (function() {
     document.addEventListener("DOMContentLoaded", function () {
         const messageArea = document.getElementById('messageArea');
-        setInterval(update, POLLING*1000);
+        intervalId = setInterval(update, POLLING*1000);
 
         document.getElementById('messageForm').addEventListener('submit', addMessage);
 
         messageArea.scrollTop = messageArea.scrollHeight;
+
+        document.getElementById('msgSearch').addEventListener('submit', searchMessage);
+
+        document.getElementById('exitSearchButton').addEventListener('click', exitSearchMode);
 
         document.querySelectorAll(".bi-pencil").forEach(button => {
             button.addEventListener("click", editMessageMode)
@@ -66,6 +71,71 @@ const DOM = (function() {
         } catch (error) {
             err_msg.innerHTML = error.message;
         }
+    }
+
+    async function searchMessage(event){
+        event.preventDefault();
+        const searchInput = document.getElementById('search-input');
+        const searchTerm = searchInput.value.trim();
+        const err_msg = document.getElementById('searchErrMsg');
+        const messageArea = document.getElementById('messageArea');
+
+        if(!searchTerm){
+            await update();
+            return;
+        }
+
+        try {
+            clearInterval(intervalId);
+
+            const response = await fetch(`/chatroom/search`, {
+                method: 'post',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ searchTerm: searchTerm })
+            });
+            if (response.redirected) {
+                window.location.href = response.url;
+                return;
+            }
+            else if (response.ok) {
+                const { messages } = await response.json();
+                //messageArea.innerHTML = '';
+
+                document.getElementById('searchResults').classList.remove('d-none');
+
+                if (messages.length === 0) {
+                    //messageArea.innerHTML = '<div class="alert alert-info">No messages found containing the word "${searchTerm}".</div>';
+                    messageArea.innerHTML = `<div class="alert alert-info">No messages found containing the word "${searchTerm}".</div>`;
+                }
+                else{
+                    document.getElementById('searchTermDisplay').textContent = `Search results for: "${searchTerm}"`;
+                    displayMessages(messages);
+                }
+                err_msg.innerHTML = '';
+                searchInput.value = '';
+            }
+            else {
+                throw new Error('Failed to search message');
+            }
+        }
+        catch (error) {
+            console.error(error);
+            err_msg.innerHTML = error.message;
+        }
+        finally {
+            intervalId = setInterval(update, POLLING * 1000);
+        }
+    }
+
+    async function exitSearchMode(event){
+        const searchInput = document.getElementById('search-input');
+        const searchResults = document.getElementById('searchResults');
+
+        searchInput.value = '';
+        searchResults.classList.add('d-none');
+        await update();
     }
 
     function editMessageMode(event) {
@@ -205,6 +275,7 @@ const DOM = (function() {
 
     function displayMessages(messages){
         const msg_area = document.getElementById('messageArea');
+        //msg_area.innerHTML = '';
 
         messages.forEach(message => {
             const div = document.getElementById(message.id);

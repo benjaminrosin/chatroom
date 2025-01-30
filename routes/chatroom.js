@@ -9,6 +9,10 @@ router.get('/add', messageController.unexpected)
 
 router.post('/add', messageController.addMsg)
 
+router.get('/search', messageController.unexpected)
+
+router.post('/search', messageController.searchMsg)
+
 router.get('/edit', messageController.unexpected)
 
 router.post('/edit', messageController.editMsg)

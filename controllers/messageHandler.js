@@ -50,6 +50,32 @@ exports.addMsg = async (req, res) => {
     }
 }
 
+exports.searchMsg = async (req, res) => {
+    try{
+        const searchTerm = req.body.searchTerm;
+
+        if (!searchTerm) {
+            return res.status(400).json({error: 'Search term is required'});
+        }
+        const messages = await Message.findAll({
+            where: {
+                content: {
+                    [Op.like]: `%${searchTerm}%`
+                }
+                },
+            include: [{
+                model: User,
+                attributes: ['firstName', 'lastName']
+            }]
+        });
+        res.json({ messages });
+    }
+    catch (err){
+        console.error('Search error:', err);
+        res.status(500).json({ error: 'Failed to search messages' });
+    }
+}
+
 exports.editMsg = async (req, res) => {
     try{
         const { messageId, newContent } = req.body;
