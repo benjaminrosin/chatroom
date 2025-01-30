@@ -5,6 +5,10 @@ let intervalId = null;
 const DOM = (function() {
     document.addEventListener("DOMContentLoaded", function () {
         const messageArea = document.getElementById('messageArea');
+
+        if (intervalId) {
+            clearInterval(intervalId);
+        }
         intervalId = setInterval(update, POLLING*1000);
 
         document.getElementById('messageForm').addEventListener('submit', addMessage);
@@ -80,9 +84,14 @@ const DOM = (function() {
 
         if(!searchTerm){
             systemMessages.innerHTML = '';
+            err_msg.innerHTML = 'Search text cannot be empty';
             document.getElementById('messageForm').classList.remove('d-none');
             document.getElementById('searchResults').classList.add('d-none');
-            await update();
+            if (intervalId) {
+                clearInterval(intervalId);
+            }
+            intervalId = setInterval(update, POLLING * 1000);
+            scrollToBottom();
             return;
         }
 
@@ -140,6 +149,10 @@ const DOM = (function() {
 
         document.querySelectorAll('.message').forEach(msg => msg.classList.remove('d-none'));
         document.getElementById('messageForm').classList.remove('d-none');
+
+        if (intervalId) {
+            clearInterval(intervalId);
+        }
         intervalId = setInterval(update, POLLING * 1000);
 
         await update();
