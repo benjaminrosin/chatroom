@@ -13,11 +13,19 @@ exports.loginValidation = async(req, res) => {
     if (user){
         const match = await bcrypt.compare(req.body.password, user.password);
         if (match) {
+            // Check if another user is active
+            if (req.session.activeUser && req.session.activeUser !== user.id) {
+                return res.render('login', {
+                    title: 'Login',
+                    msg: '',
+                    errMsg: "Another user is already logged-in in another tab"
+                });
+            }
             req.session.user = {
                 id: user.id,
                 isLoggedIn: true
             };
-            //req.session.lastUpdated = new Date();
+            req.session.activeUser = user.id;
             res.redirect('chatroom');
         }
         else{

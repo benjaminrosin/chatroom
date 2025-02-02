@@ -1,3 +1,33 @@
-<h1><%= message %></h1>
-<h2><%= error.status %></h2>
-<pre><%= error.stack %></pre>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('includes/head.ejs') %>
+    <title>Error <%= error.status || 500 %></title>
+</head>
+<body>
+<nav class="navbar navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">
+            <img src="/images/logo1.png" alt="Chat Room Logo" height="30">
+        </a>
+    </div>
+</nav>
+<div class="container d-flex flex-column justify-content-center align-items-center vh-100 text-center">
+    <div class="display-1 text-danger fw-bold"><%= error.status || 500 %></div>
+    <div class="h4 mb-3">Oops! <%= message %></div>
+
+    <!-- Stack trace בתוך קופסה מעוצבת -->
+    <div class="bg-light p-3 rounded w-75 mb-4">
+        <div class="text-start" style="max-height: 300px; overflow-y: auto;">
+            <pre class="mb-0"><%= error.stack %></pre>
+        </div>
+    </div>
+
+    <div class="mt-2">
+        <a href="javascript:history.back()" class="btn btn-secondary me-2">Go Back</a>
+        <a href="/" class="btn btn-primary">Home</a>
+    </div>
+</div>
+<%- include('includes/end.ejs') %>
+</body>
+</html>

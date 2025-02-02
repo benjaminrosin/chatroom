@@ -13,10 +13,6 @@ exports.getchat = async (req, res) => {
                 deleted: false
             }]
         });
-
-        //req.session.lastUpdate = Date.now();
-        //req.body.lastUpdate = Date.now();
-
         const user = await User.findOne({
             select: ['firstName'],
             where:{id: req.session.user.id}
@@ -24,12 +20,11 @@ exports.getchat = async (req, res) => {
 
         res.render('chatroom', { title: 'Chat', firstName: user.firstName, messages: newMessages, user_id: req.session.user.id});
     }
-    catch(err){
-        console.log(err);
-
-        //next(err);
-        //return res.redirect('/login');
-        //res.redirect('/');
+    catch(err) {
+        res.render('error', {
+            message: 'Could not load chat room',
+            error: err
+        });
     }
 }
 
@@ -37,16 +32,23 @@ exports.addMsg = async (req, res) => {
     try{
         const content = req.body.message;
 
+        if (!content?.trim()) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Message cannot be empty'
+            });
+        }
+
         await Message.create({content: content, user_id: req.session.user.id});
 
         await update(req, res);
     }
-    catch(err){
-        console.log(err);
+    catch(err) {
         res.status(500).json({
             status: 'error',
-            messages: 'cannot update messages'
+            message: 'Could not add message'
         });
+
     }
 }
 
@@ -54,9 +56,17 @@ exports.searchMsg = async (req, res) => {
     try{
         const searchTerm = req.body.searchTerm;
 
-        if (!searchTerm) {
+        /*if (!searchTerm) {
             return res.status(400).json({error: 'Search term is required'});
+        }*/
+
+        if (!searchTerm) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Search term is required'
+            });
         }
+
         const messages = await Message.findAll({
             where: {
                 content: {
@@ -71,8 +81,11 @@ exports.searchMsg = async (req, res) => {
         res.json({ messages });
     }
     catch (err){
-        console.error('Search error:', err);
-        res.status(500).json({ error: 'Failed to search messages' });
+        console.error('Error in searchMsg:', err);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to search messages'
+        });
     }
 }
 
@@ -85,8 +98,8 @@ exports.editMsg = async (req, res) => {
             {where: {id: messageId, user_id: userId}}
         );
 
-        if(messageToEdit[0] === 0){
-            throw new Error();
+        if (messageToEdit[0] === 0) {
+            throw new Error('Message not found or cannot be edited');
         }
 
         await update(req, res);
@@ -94,9 +107,10 @@ exports.editMsg = async (req, res) => {
     }
     catch (err) {
         console.log(err);
+        console.error('Error in editMsg:', err);
         res.status(500).json({
             status: 'error',
-            messages: 'the message does not found or cannot be edited'
+            message: 'Failed to edit message'
         });
     }
 }
@@ -109,17 +123,17 @@ exports.deleteMsg = async (req, res) => {
             { where: {id:messageId}
             });
 
-        if(effectedRows === 0){
-            throw new Error();
+        if (effectedRows === 0) {
+            throw new Error('Message not found or cannot be deleted');
         }
 
         await update(req, res);
     }
     catch (err) {
-        console.log(err);
+        console.error('Error in deleteMsg:', err);
         res.status(500).json({
             status: 'error',
-            messages: 'the message does not found or cannot be deleted'
+            message: 'Failed to delete message'
         });
     }
 }
@@ -161,9 +175,10 @@ async function update(req, res) {
         });
     }
     catch (err){
+        console.error('Error in update:', err);
         res.status(500).json({
             status: 'error',
-            messages: 'cannot update messages'
+            message: 'Cannot update messages'
         });
     }
 }
