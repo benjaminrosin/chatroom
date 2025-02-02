@@ -58,7 +58,20 @@ const DOM = (function() {
                 window.location.href = response.url;
                 return;
             }
-            else if (response.ok) {
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message);
+            }
+
+            last_updated = Date.now();
+            displayMessages(data.messages);
+            input.value = '';
+            err_msg.innerHTML = '';
+            scrollToBottom();
+
+            /*else if (response.ok) {
                 last_updated = Date.now();
                 const {messages} = await response.json();
                 displayMessages(messages);
@@ -69,7 +82,7 @@ const DOM = (function() {
             }
             else {
                 throw new Error("cannot add message");
-            }
+            }*/
         } catch (error) {
             err_msg.innerHTML = error.message;
         }
@@ -102,7 +115,36 @@ const DOM = (function() {
                 window.location.href = response.url;
                 return;
             }
-            else if (response.ok) {
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message);
+            }
+
+            //document.getElementById('searchTermDisplay').textContent = `Search results for: "${searchTerm}"`;
+            document.getElementById('searchTermDisplay').textContent = `Found ${data.messages.length} messages for: "${searchTerm}"`;
+            document.getElementById('searchResultsMessageArea').innerHTML= '';
+
+            displayMessages(data.messages, false,'searchResultsMessageArea');
+
+
+            /*
+            document.getElementById('searchTermDisplay').textContent = `Search results for: "${searchTerm}"`;
+            document.getElementById('searchResults').classList.remove('d-none');
+
+            if (data.messages.length === 0) {
+                systemMessages.innerHTML = `<div class="alert alert-info">No messages found containing the word "${searchTerm}".</div>`;
+                displayMessages([]);
+            }
+            else{
+                systemMessages.innerHTML = '';
+                displayMessages(data.messages);
+            }*/
+            err_msg.innerHTML = '';
+            searchInput.value = '';
+
+            /*else if (response.ok) {
                 const { messages } = await response.json();
 
                 //document.getElementById('searchTermDisplay').textContent = `Search results for: "${searchTerm}"`;
@@ -122,10 +164,10 @@ const DOM = (function() {
             }
             else {
                 throw new Error('Failed to search message');
-            }
+            }*/
         }
         catch (error) {
-            console.error(error);
+            //console.error(error);
             err_msg.innerHTML = error.message;
         }
     }
@@ -185,18 +227,29 @@ const DOM = (function() {
                 window.location.href = response.url;
                 return;
             }
-            else if (response.ok) {
-                last_updated = Date.now();
-                const {messages} = await response.json();
-                displayMessages(messages, false);
-                editMessageMode(event);
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message);
             }
+
+            last_updated = Date.now();
+            displayMessages(data.messages, false);
+            editMessageMode(event);
+
+                /*else if (response.ok) {
+                    last_updated = Date.now();
+                    const {messages} = await response.json();
+                    displayMessages(messages, false);
+                    editMessageMode(event);
+                }*/
             /*else if(response.status === 401 || response.status === 403) {
                 window.location.href = '/login';
-            }*/
+            }
             else {
                 throw new Error('Failed to delete message');
-            }
+            }*/
         } catch (error) {
             console.error(error);
         }
@@ -217,23 +270,65 @@ const DOM = (function() {
                 window.location.href = response.url;
                 return;
             }
-            else if (response.ok) {
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message);
+            }
+
+            last_updated = Date.now();
+            displayMessages(data.messages, false);
+
+            /*else if (response.ok) {
                 last_updated = Date.now();
                 const {messages} = await response.json();
                 displayMessages(messages, false);
 
-            } /*else if(response.status === 401 || response.status === 403) {
+            } */
+            /*else if(response.status === 401 || response.status === 403) {
                 window.location.href = '/login';
-            }*/
+            }
             else {
                 throw new Error('Failed to delete message');
-            }
+            }*/
         } catch (error) {
             console.error(error);
         }
     }
 
-    async function update(){
+    async function update() {
+        try {
+            const response = await fetch('/chatroom/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    last_updated: new Date(last_updated).toISOString()
+                })
+            });
+
+            if (response.redirected) {
+                window.location.href = response.url;
+                return;
+            }
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message);
+            }
+
+            last_updated = Date.now();
+            displayMessages(data.messages);
+
+        } catch (error) {
+            console.error('Error updating messages:', error.message);
+        }
+    }
+
+    /*async function update(){
         const response = await fetch('/chatroom/update', {
             method: 'POST',
             headers: {
@@ -255,6 +350,24 @@ const DOM = (function() {
             throw new Error("cannot refresh");
         }
     }
+    */
+
+    /*function displayMessages(messages){
+        const msg_area = document.getElementById('messageArea');
+        const isSearchMode = !document.getElementById('searchResults').classList.contains('d-none');
+
+        if (isSearchMode) {
+            document.querySelectorAll('.message').forEach(msg => msg.classList.add('d-none'));
+            messages.forEach(message => {
+                const div = document.getElementById(message.id);
+                if (div) {
+                    div.classList.remove('d-none');
+                }
+            });
+        }
+        else{
+            document.querySelectorAll('.message').forEach(msg => msg.classList.remove('d-none'));
+        }*/
 
     function displayMessages(messages, scheduled = true, id = 'messageArea'){
         const msg_area = document.getElementById(id);

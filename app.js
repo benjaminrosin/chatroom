@@ -59,7 +59,17 @@ const authMiddleware = function (req, res, next) {
   if (!req.session.user || !req.session.user.isLoggedIn) {
     return res.redirect('/login');
   }
+
+  // If there's an active user in session and it's different from current user
+  if (req.session.activeUser && req.session.activeUser !== req.session.user.id) {
+    return res.redirect('/login');
+  }
+
+  // Save active user in session
+  req.session.activeUser = req.session.user.id;
   next();
+
+  //next();
 }
 
 app.get('/', authMiddleware, function(req, res) {
@@ -84,6 +94,24 @@ app.use('/chatroom', authMiddleware, chatRouter);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
+});
+
+app.use(function(err, req, res, next) {
+  console.error('Error:', err);
+
+  const isApiRequest = req.xhr || req.headers.accept?.indexOf('json') > -1;
+
+  if (isApiRequest) {
+    return res.status(err.status || 500).json({
+      status: 'error',
+      message: err.message || 'Something went wrong'
+    });
+  }
+
+  res.locals.message = err.message;
+  res.locals.error = err;
+  res.status(err.status || 500);
+  res.render('error');
 });
 
 // error handler
