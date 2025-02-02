@@ -83,10 +83,11 @@ const DOM = (function() {
             }
             else {
                 //--------------------------------------------------------------------------------------
-                if (Array.isArray(data.error?.errors)){
-                    throw new Error(data.error.errors[0].message);
+                const error = await response.json()
+                if (Array.isArray(error?.errors)){
+                    throw new Error(error.errors[0].message);
                 }
-                throw new Error(data.message);
+                throw new Error(error.message);
             }
         } catch (error) {
             err_msg.innerHTML = error.message;
@@ -98,7 +99,6 @@ const DOM = (function() {
         const searchInput = document.getElementById('search-input');
         const searchTerm = searchInput.value.trim();
         const err_msg = document.getElementById('searchErrMsg');
-        //const systemMessages = document.getElementById('systemMessages');
         const searchResults = document.getElementById('searchResults');
 
         if(!searchTerm || searchTerm === ''){
@@ -132,58 +132,10 @@ const DOM = (function() {
                 searchInput.value = '';
             }
             else {
-                throw new Error('Failed to search message');
+                const error = await response.json()
+                throw new Error(error.message);
+                //throw new Error('Failed to search message');
             }
-/*
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message);
-            }
-
-            //document.getElementById('searchTermDisplay').textContent = `Search results for: "${searchTerm}"`;
-            document.getElementById('searchTermDisplay').textContent = `Found ${data.messages.length} messages for: "${searchTerm}"`;
-            document.getElementById('searchResultsMessageArea').innerHTML= '';
-
-            displayMessages(data.messages, false,'searchResultsMessageArea');
-
-*/
-            /*
-            document.getElementById('searchTermDisplay').textContent = `Search results for: "${searchTerm}"`;
-            document.getElementById('searchResults').classList.remove('d-none');
-
-            if (data.messages.length === 0) {
-                systemMessages.innerHTML = `<div class="alert alert-info">No messages found containing the word "${searchTerm}".</div>`;
-                displayMessages([]);
-            }
-            else{
-                systemMessages.innerHTML = '';
-                displayMessages(data.messages);
-            }*/
-
-            /*else if (response.ok) {
-                const { messages } = await response.json();
-
-                //document.getElementById('searchTermDisplay').textContent = `Search results for: "${searchTerm}"`;
-                document.getElementById('searchTermDisplay').textContent = `Found ${messages.length} messages for: "${searchTerm}"`;
-                document.getElementById('searchResultsMessageArea').innerHTML= '';
-
-                /*if (messages.length === 0) {
-                    systemMessages.innerHTML = `<div class="alert alert-info">No messages found containing the word "${searchTerm}".</div>`;
-                }
-                else{
-                    systemMessages.innerHTML = '';
-                }* /
-                displayMessages(messages, false,'searchResultsMessageArea');
-                }
-                displayMessages(data.messages, false,'searchResultsMessageArea');
-
-                err_msg.innerHTML = '';
-                searchInput.value = '';
-            }
-            else {
-                throw new Error('Failed to search message');
-            }*/
         }
         catch (error) {
             //console.error(error);
@@ -219,13 +171,10 @@ const DOM = (function() {
         event.preventDefault();
         const messageElement = event.target.closest('.message');
         const messageId = messageElement.dataset.id;
-        const newMessage = messageElement.querySelector('input').value.trim();
+        const messageInput = messageElement.querySelector('input');
+        const newMessage = messageInput.value.trim();
         const oldMessage = messageElement.querySelector(".msg-display").innerHTML
 
-        if (!newMessage || newMessage === '') {
-            //add invalid?
-            return;
-        }
         if (newMessage === oldMessage){
             editMessageMode(event);
             return;
@@ -251,9 +200,6 @@ const DOM = (function() {
                     const {messages} = await response.json();
                     displayMessages(messages, false);
                     editMessageMode(event);
-            }
-            else {
-                window.location.href = '/error';
             }
         }
         catch (error) {
@@ -282,46 +228,15 @@ const DOM = (function() {
                 const {messages} = await response.json();
                 displayMessages(messages, false);
             }
-            else {
+            /*else {
                 window.location.href = '/error';
-            }
+            }*/
         } catch (error) {
             console.error(error);
             window.location.href = '/error';
         }
     }
-/*
-    async function update() {
-        try {
-            const response = await fetch('/api/update', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    last_updated: new Date(last_updated).toISOString()
-                })
-            });
 
-            if (response.redirected) {
-                window.location.href = response.url;
-                return;
-            }
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message);
-            }
-
-            last_updated = Date.now();
-            displayMessages(data.messages);
-
-        } catch (error) {
-            console.error('Error updating messages:', error.message);
-        }
-    }
-*/
     async function update(){
         const response = await fetch('/api/update', {
             method: 'POST',
@@ -345,23 +260,6 @@ const DOM = (function() {
             //throw new Error("cannot refresh");
         }
     }
-
-    /*function displayMessages(messages){
-        const msg_area = document.getElementById('messageArea');
-        const isSearchMode = !document.getElementById('searchResults').classList.contains('d-none');
-
-        if (isSearchMode) {
-            document.querySelectorAll('.message').forEach(msg => msg.classList.add('d-none'));
-            messages.forEach(message => {
-                const div = document.getElementById(message.id);
-                if (div) {
-                    div.classList.remove('d-none');
-                }
-            });
-        }
-        else{
-            document.querySelectorAll('.message').forEach(msg => msg.classList.remove('d-none'));
-        }*/
 
     function displayMessages(messages, scheduled = true, id = 'messageArea'){
         const msg_area = document.getElementById(id);
@@ -409,7 +307,7 @@ const DOM = (function() {
                                 </p>              
                                 <p class="mb-1 msg-display">${message.content}</p>
                                 <form class="input-group mb-3 msg-edit d-none">
-                                    <input type="text" class="form-control" required>
+                                    <input type="text" class="form-control" pattern=".*/S.*" required>
                                     <button class="btn btn-outline-secondary bi bi-floppy-fill" type="submit"></button>
                                     <button class="btn btn-outline-secondary bi bi-x-circle" type="button"></button>
                                 </form>
@@ -443,7 +341,6 @@ const DOM = (function() {
         const messageArea = document.getElementById('messageArea');
         messageArea.scrollTop = messageArea.scrollHeight;
     }
-
 
     return{};
 }());

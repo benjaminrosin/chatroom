@@ -7,10 +7,7 @@ exports.addMsg = async (req, res) => {
         const content = req.body.message;
 
         if (!content?.trim()) {
-            req.flash('title', 'Error!');
-            req.flash('error', 'Message cannot be empty');
-            req.flash('status', 400);
-            return res.redirect('/error');
+            return res.status(400).json({error: 'Message cannot be empty'});
         }
 
         await Message.create({content: content, user_id: req.session.user.id});
@@ -18,20 +15,13 @@ exports.addMsg = async (req, res) => {
         await update(req, res);
     }
     catch(err) {
-        req.flash('title', 'Error!');
-        req.flash('error', 'Could not add message');
-        req.flash('status', 500);
-        return res.redirect('/error');
+       return res.status(400).json({error:err});
     }
 }
 
 exports.searchMsg = async (req, res) => {
     try{
         const searchTerm = req.body.searchTerm;
-
-        /*if (!searchTerm) {
-            return res.status(400).json({error: 'Search term is required'});
-        }*/
 
         if (!searchTerm) {
             req.flash('title', 'Error!');
@@ -74,13 +64,6 @@ exports.searchMsg = async (req, res) => {
 
 exports.editMsg = async (req, res) => {
     try{
-        if (!req.session.user) {
-            req.flash('title', 'Error!');
-            req.flash('error', 'Unauthorized');
-            req.flash('status', 401);
-            return res.redirect('/error');
-        }
-
         const { messageId, newContent } = req.body;
         const userId = req.session.user.id;
 

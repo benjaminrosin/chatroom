@@ -75,7 +75,7 @@
                             </p>
                             <p class="mb-1 msg-display"><%= message.content %></p>
                             <form class="input-group mb-3 msg-edit d-none">
-                                <input type="text" class="form-control" required>
+                                <input type="text" class="form-control" pattern=".*/S.*" required>
                                 <button class="btn btn-outline-secondary bi bi-floppy-fill" type="submit"></button>
                                 <button class="btn btn-outline-secondary bi bi-x-circle" type="button"></button>
                             </form>
