@@ -59,7 +59,7 @@ const DOM = (function() {
                 return;
             }
 
-            const data = await response.json();
+            /*const data = await response.json();
 
             if (!response.ok) {
                 throw new Error(data.message);
@@ -69,9 +69,9 @@ const DOM = (function() {
             displayMessages(data.messages);
             input.value = '';
             err_msg.innerHTML = '';
-            scrollToBottom();
+            scrollToBottom();*/
 
-            /*else if (response.ok) {
+            else if (response.ok) {
                 last_updated = Date.now();
                 const {messages} = await response.json();
                 displayMessages(messages);
@@ -82,7 +82,7 @@ const DOM = (function() {
             }
             else {
                 throw new Error("cannot add message");
-            }*/
+            }
         } catch (error) {
             err_msg.innerHTML = error.message;
         }
@@ -118,10 +118,10 @@ const DOM = (function() {
             else if (response.ok) {
                 const { messages } = await response.json();
 
-                document.getElementById('searchTermDisplay').textContent = `Found ${data.messages.length} messages for: "${searchTerm}"`;
+                document.getElementById('searchTermDisplay').textContent = `Found ${messages.length} messages for: "${searchTerm}"`;
                 document.getElementById('searchResultsMessageArea').innerHTML= '';
 
-                displayMessages(data.messages, false,'searchResultsMessageArea');
+                displayMessages(messages, false,'searchResultsMessageArea');
 
                 err_msg.innerHTML = '';
                 searchInput.value = '';
