@@ -3,6 +3,10 @@ let last_updated = new Date(-8640000000000000);
 let intervalId = null;
 
 const DOM = (function() {
+    /**
+     * Initializes DOM event listeners and polling interval
+     * @listens DOMContentLoaded
+     */
     document.addEventListener("DOMContentLoaded", function () {
         const messageArea = document.getElementById('messageArea');
 
@@ -37,6 +41,11 @@ const DOM = (function() {
         })
     })
 
+    /**
+     * Adds new message to chat
+     * @param {Event} event - Form submission event
+     * @returns {Promise<void>}
+     */
     async function addMessage(event) {
         event.preventDefault();
         const input = document.getElementById('messageInput');
@@ -60,18 +69,6 @@ const DOM = (function() {
                 return;
             }
 
-            /*const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message);
-            }
-
-            last_updated = Date.now();
-            displayMessages(data.messages);
-            input.value = '';
-            err_msg.innerHTML = '';
-            scrollToBottom();*/
-
             else if (response.ok) {
                 last_updated = Date.now();
                 const {messages} = await response.json();
@@ -94,6 +91,11 @@ const DOM = (function() {
         }
     }
 
+    /**
+     * Searches messages by term and displays results
+     * @param {Event} event - Search form submission event
+     * @returns {Promise<void>}
+     */
     async function searchMessage(event){
         event.preventDefault();
         const searchInput = document.getElementById('search-input');
@@ -143,6 +145,9 @@ const DOM = (function() {
         }
     }
 
+    /**
+     * Exits search mode and returns to main chat view
+     */
     function exitSearchMode(){
         const searchInput = document.getElementById('search-input');
         //const systemMessages = document.getElementById('systemMessages');
@@ -155,7 +160,10 @@ const DOM = (function() {
 
         scrollToBottom();
     }
-
+    /**
+     * Toggles message edit mode UI
+     * @param {Event} event - Edit button click event
+     */
     function editMessageMode(event) {
         const messageElement = event.target.closest('.message');
         const displayDiv = messageElement.querySelector('.msg-display');
@@ -167,6 +175,11 @@ const DOM = (function() {
         editDiv.classList.toggle("d-none");
     }
 
+    /**
+     * Updates message content
+     * @param {Event} event - Edit form submission event
+     * @returns {Promise<void>}
+     */
     async function editMessage(event) {
         event.preventDefault();
         const messageElement = event.target.closest('.message');
@@ -208,6 +221,11 @@ const DOM = (function() {
         }
     }
 
+    /**
+     * Removes message from chat
+     * @param {Event} event - Delete button click event
+     * @returns {Promise<void>}
+     */
     async function removeMessage(event) {
         const messageId = event.target.closest('.message').dataset.id;
 
@@ -237,6 +255,10 @@ const DOM = (function() {
         }
     }
 
+    /**
+     * Polls server for new messages
+     * @returns {Promise<void>}
+     */
     async function update(){
         const response = await fetch('/api/update', {
             method: 'POST',
@@ -257,10 +279,15 @@ const DOM = (function() {
         }
         else {
             console.error('Error updating messages');
-            //throw new Error("cannot refresh");
         }
     }
 
+    /**
+     * Renders messages in the chat area
+     * @param {Array} messages - Array of message objects
+     * @param {boolean} [scheduled=true] - Whether update is from scheduled polling
+     * @param {string} [id='messageArea'] - Target element ID
+     */
     function displayMessages(messages, scheduled = true, id = 'messageArea'){
         const msg_area = document.getElementById(id);
 
@@ -337,6 +364,9 @@ const DOM = (function() {
 
     }
 
+    /**
+     * Scrolls chat to bottom
+     */
     function scrollToBottom() {
         const messageArea = document.getElementById('messageArea');
         messageArea.scrollTop = messageArea.scrollHeight;

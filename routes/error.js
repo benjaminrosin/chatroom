@@ -1,3 +1,7 @@
+/**
+ * Express router configuration for error handling
+ * @module errorRouter
+ */
 const express = require('express');
 const router = express.Router();
 

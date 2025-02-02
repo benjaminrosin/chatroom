@@ -1,7 +1,12 @@
 const {User, Message} = require('../models/user');
 const {Sequelize, Op} = require("sequelize");
 
-
+/**
+ * Creates a new message
+ * @param {Object} req - Express request object with message content
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
 exports.addMsg = async (req, res) => {
     try{
         const content = req.body.message;
@@ -19,6 +24,12 @@ exports.addMsg = async (req, res) => {
     }
 }
 
+/**
+ * Searches messages containing specific term
+ * @param {Object} req - Express request object with search term
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
 exports.searchMsg = async (req, res) => {
     try{
         const searchTerm = req.body.searchTerm;
@@ -62,6 +73,12 @@ exports.searchMsg = async (req, res) => {
     }
 }
 
+/**
+ * Edits an existing message
+ * @param {Object} req - Express request object with messageId and new content
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
 exports.editMsg = async (req, res) => {
     try{
         const { messageId, newContent } = req.body;
@@ -110,6 +127,12 @@ exports.editMsg = async (req, res) => {
     }
 }
 
+/**
+ * Soft deletes a message
+ * @param {Object} req - Express request object with messageId
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
 exports.deleteMsg = async (req, res) => {
     try {
         const { messageId } = req.body;
@@ -158,6 +181,12 @@ exports.deleteMsg = async (req, res) => {
     }
 }
 
+/**
+ * Fetches messages updated after specified timestamp
+ * @param {Object} req - Express request object with last_updated timestamp
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
 async function update(req, res) {
     try {
         const newMessages = await Message.findAll({

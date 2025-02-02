@@ -1,3 +1,7 @@
+/**
+ * Main Express application configuration
+ * @module app
+ */
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
@@ -24,6 +28,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+/**
+ * Database initialization and synchronization
+ * @async
+ */
 (async () => {
   try {
     await sequelize.authenticate();
@@ -45,6 +53,11 @@ app.use(session({
 
 app.use(flash());
 
+/**
+ * Handles user logout
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
 app.get('/logout', function(req, res) {
   req.session.destroy((err) => {
     if(err) {
@@ -56,6 +69,12 @@ app.get('/logout', function(req, res) {
   });
 });
 
+/**
+ * Authentication middleware
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ */
 const authMiddleware = function (req, res, next) {
   if (!req.session.user || !req.session.user.isLoggedIn) {
     return res.redirect('/login');
@@ -69,37 +88,31 @@ const authMiddleware = function (req, res, next) {
   // Save active user in session
   req.session.activeUser = req.session.user.id;
   next();
-
-  //next();
 }
 
 app.get('/', authMiddleware, function(req, res) {
   return res.redirect('/chatroom');
 });
 
-/*
-app.get('/', function(req, res, next) {
-  if (!req.session.user || !req.session.user.isLoggedIn) {
-    return res.redirect('/login');
-  }
-  return res.redirect('/chatroom');
-  //next();
-});
-*/
 app.use('/login', loginRouter);
 app.use('/signup', signupRouter);
 app.use('/api', authMiddleware,apiRouter);
 app.use('/chatroom', authMiddleware, chatRouter);
 app.use('/error', errorRouter);
 
-//app.use('/chatroom', chatRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
 });
 
-// error handler
+/**
+ * Global error handler
+ * @param {Error} err - Error object
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ */
 app.use(function(err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;

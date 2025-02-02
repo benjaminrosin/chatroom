@@ -1,3 +1,8 @@
+/**
+ * Express router configuration for chat functionality
+ * @module chatRouter
+ */
+
 var express = require('express');
 var router = express.Router();
 const messageController = require('../controllers/messageHandler')

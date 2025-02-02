@@ -3,10 +3,21 @@ const bcrypt = require("bcrypt");
 const users = require("../models/user");
 const REGISTER = 30;
 
+/**
+ * Renders login page
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
 exports.newLogin = function(req, res) {
     res.render('login', { title: 'Login', msg: '', errMsg: ''});
 }
 
+/**
+ * Validates user login credentials and manages session
+ * @param {Object} req - Express request object with email and password
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
 exports.loginValidation = async(req, res) => {
     const user = await User.findOne({where:{email: req.body.email.trim().toLowerCase()}});
 
@@ -37,10 +48,22 @@ exports.loginValidation = async(req, res) => {
     }
 }
 
+/**
+ * Renders signup page
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
 exports.newSignup = async(req, res) => {
     res.render('signup', { title: 'Signup' , startRegistration: true, errorMsg: ''});
 }
 
+/**
+ * Verifies email availability and stores registration data in cookie
+ * @param {Object} req - Express request object with email and user details
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
 exports.checkEmailAvailability = async (req, res) => {
     const email = req.body.email.trim().toLowerCase();
     const result = await users.User.findOne({where: {email: email}});
@@ -63,6 +86,12 @@ exports.checkEmailAvailability = async (req, res) => {
     }
 }
 
+/**
+ * Completes user registration using stored cookie data
+ * @param {Object} req - Express request object with password
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ */
 exports.register = async(req, res) => {
     if(!req.cookies.registerData){
         res.render('signup', { title: 'Signup' , startRegistration: true , errorMsg: 'session expired, please try again'});
