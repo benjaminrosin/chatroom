@@ -80,25 +80,16 @@ const DOM = (function() {
         const searchInput = document.getElementById('search-input');
         const searchTerm = searchInput.value.trim();
         const err_msg = document.getElementById('searchErrMsg');
-        const systemMessages = document.getElementById('systemMessages');
+        //const systemMessages = document.getElementById('systemMessages');
+        const searchResults = document.getElementById('searchResults');
 
-        if(!searchTerm){
-            systemMessages.innerHTML = '';
-            err_msg.innerHTML = 'Search text cannot be empty';
-            document.getElementById('messageForm').classList.remove('d-none');
-            document.getElementById('searchResults').classList.add('d-none');
-            if (intervalId) {
-                clearInterval(intervalId);
-            }
-            intervalId = setInterval(update, POLLING * 1000);
-            scrollToBottom();
-            return;
+        if(!searchTerm || searchTerm === ''){
+            return exitSearchMode();
         }
 
         try {
-            clearInterval(intervalId);
-            document.getElementById('messageForm').classList.add('d-none');
-            document.querySelectorAll('.message').forEach(msg => msg.classList.add('d-none'));
+            searchResults.classList.remove('d-none');
+            document.getElementById("chatroom").classList.add('d-none');
 
             const response = await fetch(`/chatroom/search`, {
                 method: 'post',
@@ -114,17 +105,18 @@ const DOM = (function() {
             else if (response.ok) {
                 const { messages } = await response.json();
 
-                document.getElementById('searchTermDisplay').textContent = `Search results for: "${searchTerm}"`;
-                document.getElementById('searchResults').classList.remove('d-none');
+                //document.getElementById('searchTermDisplay').textContent = `Search results for: "${searchTerm}"`;
+                document.getElementById('searchTermDisplay').textContent = `Found ${messages.length} messages for: "${searchTerm}"`;
+                document.getElementById('searchResultsMessageArea').innerHTML= '';
 
-                if (messages.length === 0) {
+                /*if (messages.length === 0) {
                     systemMessages.innerHTML = `<div class="alert alert-info">No messages found containing the word "${searchTerm}".</div>`;
-                    displayMessages([]);
                 }
                 else{
                     systemMessages.innerHTML = '';
-                    displayMessages(messages);
-                }
+                }*/
+                displayMessages(messages, false,'searchResultsMessageArea');
+
                 err_msg.innerHTML = '';
                 searchInput.value = '';
             }
@@ -138,24 +130,16 @@ const DOM = (function() {
         }
     }
 
-    async function exitSearchMode(){
+    function exitSearchMode(){
         const searchInput = document.getElementById('search-input');
-        const searchResults = document.getElementById('searchResults');
-        const systemMessages = document.getElementById('systemMessages');
+        //const systemMessages = document.getElementById('systemMessages');
 
         searchInput.value = '';
-        searchResults.classList.add('d-none');
-        systemMessages.innerHTML = '';
+        //systemMessages.innerHTML = '';
 
-        document.querySelectorAll('.message').forEach(msg => msg.classList.remove('d-none'));
-        document.getElementById('messageForm').classList.remove('d-none');
+        document.getElementById('chatroom').classList.remove('d-none');
+        document.getElementById('searchResults').classList.add('d-none');
 
-        if (intervalId) {
-            clearInterval(intervalId);
-        }
-        intervalId = setInterval(update, POLLING * 1000);
-
-        await update();
         scrollToBottom();
     }
 
@@ -173,11 +157,11 @@ const DOM = (function() {
     async function editMessage(event) {
         event.preventDefault();
         const messageElement = event.target.closest('.message');
-        const messageId = messageElement.id;
+        const messageId = messageElement.dataset.id;
         const newMessage = messageElement.querySelector('input').value.trim();
         const oldMessage = messageElement.querySelector(".msg-display").innerHTML
 
-        if (!newMessage) {
+        if (!newMessage || newMessage === '') {
             //add invalid?
             return;
         }
@@ -204,7 +188,7 @@ const DOM = (function() {
             else if (response.ok) {
                 last_updated = Date.now();
                 const {messages} = await response.json();
-                displayMessages(messages);
+                displayMessages(messages, false);
                 editMessageMode(event);
             }
             /*else if(response.status === 401 || response.status === 403) {
@@ -219,7 +203,7 @@ const DOM = (function() {
     }
 
     async function removeMessage(event) {
-        const messageId = event.target.closest('.message').id;
+        const messageId = event.target.closest('.message').dataset.id;
 
         try {
             const response = await fetch(`/chatroom/delete`, {
@@ -236,7 +220,7 @@ const DOM = (function() {
             else if (response.ok) {
                 last_updated = Date.now();
                 const {messages} = await response.json();
-                displayMessages(messages);
+                displayMessages(messages, false);
 
             } /*else if(response.status === 401 || response.status === 403) {
                 window.location.href = '/login';
@@ -272,58 +256,32 @@ const DOM = (function() {
         }
     }
 
-    /*async function update(){
-        const response = await fetch('/chatroom/update', {
-            method: 'POST'
-        });
-
-        if (response.ok) {
-            const {messages} = await response.json();
-            displayMessages(messages);
-
-        } else if (response.redirected) {
-            window.location.href = response.url;
-            return;
-        }
-        else if(response.status === 401 || response.status === 403) {
-            window.location.href = '/login';
-            return;
-        }
-        else {
-            throw new Error("cannot refresh");
-        }
-    }*/
-
-    function displayMessages(messages){
-        const msg_area = document.getElementById('messageArea');
-        const isSearchMode = !document.getElementById('searchResults').classList.contains('d-none');
-
-        if (isSearchMode) {
-            document.querySelectorAll('.message').forEach(msg => msg.classList.add('d-none'));
-            messages.forEach(message => {
-                const div = document.getElementById(message.id);
-                if (div) {
-                    div.classList.remove('d-none');
-                }
-            });
-        }
-        else{
-            document.querySelectorAll('.message').forEach(msg => msg.classList.remove('d-none'));
-        }
+    function displayMessages(messages, scheduled = true, id = 'messageArea'){
+        const msg_area = document.getElementById(id);
 
         messages.forEach(message => {
-            const div = document.getElementById(message.id);
+            const div = msg_area.querySelector(`[data-id = '${message.id}']`);
+            let div2 = null;
+
+            if (scheduled === false){
+                div2 = document.getElementById('searchResultsMessageArea').querySelector(`[data-id = '${message.id}']`);
+            }
+
             if (div){
                 if (message.deleted) {
                     div.remove();
+                    div2?.remove();
                 }
                 else{
-                    //div.querySelector('small').innerText = `${new Date(message.createdAt).toLocaleString()}, edited`;
-                    //[...div.querySelectorAll('p')][1].innerHTML = message.content;
-
                     const edited = (message.createdAt === message.updatedAt) ? '' : ', edited';
                     div.querySelector('small').innerText = `${new Date(message.createdAt).toLocaleString()}${edited}`;
                     [...div.querySelectorAll('p')][1].innerHTML = message.content;
+
+                    if (div2){
+                        div2.querySelector('small').innerText = `${new Date(message.createdAt).toLocaleString()}${edited}`;
+                        [...div2.querySelectorAll('p')][1].innerHTML = message.content;
+                    }
+
                 }
 
             }
@@ -333,7 +291,7 @@ const DOM = (function() {
                 if (!message.deleted){
                     if (message.isMine) {
                         const newMessage = `
-                        <div class="message mb-3"  id= ${message.id}>
+                        <div class="message mb-3"  data-id= ${message.id}>
                             <div class="d-flex justify-content-between">
                             <div>
                                 <p class="mb-1">
@@ -358,11 +316,10 @@ const DOM = (function() {
                         newMessageElement.querySelector('.bi-trash').addEventListener('click', removeMessage);
                         newMessageElement.querySelector('.bi-x-circle').addEventListener('click', editMessageMode);
                         newMessageElement.querySelector('form').addEventListener('submit', editMessage);
-                        //add event listener
                     }
                     else {
                         const newMessage = `
-                            <div class="message mb-3" id= ${message.id}>
+                            <div class="message mb-3" data-id= ${message.id}>
                                 <p class="mb-1"><strong>${message.User.firstName + ' ' + message.User.lastName}</strong> <small class="text-muted">${new Date(message.createdAt).toLocaleString()}${edited} </small></p>
                                 <p class="mb-1">${message.content}</p>
                             </div>`

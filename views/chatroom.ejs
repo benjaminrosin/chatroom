@@ -14,7 +14,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">
+        <a class="navbar-brand" href="/">
             <img src="images/logo1.png" alt="Chat Room Logo" width="auto" height="30" class="d-inline-block align-text-top">
         </a>
         <div class="mx-auto">
@@ -33,7 +33,7 @@
                     <p class="text-danger mb-0" id="searchErrMsg"></p>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Home</a>
+                    <a class="nav-link" href="/chatroom">Home</a>
                 </li>
 
                 <li class="nav-item">
@@ -49,25 +49,29 @@
 
     <div id="systemMessages"></div>
 
-    <div id="searchResults" class="mb-3 d-none">
-        <div class="d-flex justify-content-between align-items-center">
+    <div id="searchResults" class="d-none">
+        <div class="d-flex justify-content-between align-items-center pb-3">
             <span id="searchTermDisplay"></span>
             <button class="btn btn-outline-secondary btn-sm" id="exitSearchButton">
                 Back to Chat
             </button>
         </div>
+        <div class="message-area border rounded p-3" id="searchResultsMessageArea" style="height: 60vh; overflow-y: auto;">
+
+        </div>
     </div>
 
-    <div class="message-area border rounded p-3" id="messageArea" style="height: 60vh; overflow-y: auto;">
-        <!-- Example message (from others) -->
-        <% messages.forEach(message =>{
-            if(message.user_id === user_id){%>
-                <div class="message mb-3"  id= <%= message.id %>>
+    <div class="chatroom" id="chatroom">
+        <div class="message-area border rounded p-3" id="messageArea" style="height: 60vh; overflow-y: auto;">
+            <!-- Example message (from others) -->
+            <% messages.forEach(message =>{
+            if(message.user_id === user_id){ %>
+                <div class="message mb-3" data-id= <%= message.id %>>
                     <div class="d-flex justify-content-between">
                         <div>
                             <p class="mb-1">
                                 <strong>You</strong>
-                                <small class="text-muted"><%= message.createdAt.toLocaleString()%> <%= (message.createdAt.toString()===message.updatedAt.toString())?``:`, edited`%> </small>
+                                <small class="text-muted"><%= message.createdAt.toLocaleString() %> <%= (message.createdAt.toString() === message.updatedAt.toString()) ? `` : `, edited` %> </small>
                                 <button class="btn bi bi-trash"></button>
                                 <button class="btn bi bi-pencil"></button>
                             </p>
@@ -80,78 +84,30 @@
                         </div>
                     </div>
                 </div>
-            <%}
-            else{%>
-                <div class="message mb-3" id= <%= message.id %> >
+            <% }
+            else{ %>
+                <div class="message mb-3" data-id= <%= message.id %>>
                     <p class="mb-1">
                         <strong> <%= message.User.firstName + ' ' + message.User.lastName %> </strong>
-                        <small class="text-muted"> <%= message.createdAt.toLocaleString() %> <%= (message.createdAt.toString()===message.updatedAt.toString())?``:`, edited`%></small></p>
+                        <small class="text-muted"> <%= message.createdAt.toLocaleString() %> <%= (message.createdAt.toString() === message.updatedAt.toString()) ? `` : `, edited` %></small>
+                    </p>
                     <p class="mb-1"> <%= message.content %></p>
                 </div>
-        <% }}); %>
+            <% }}); %>
 
-<!--
-        <div class="message mb-3">
-            <p class="mb-1"><strong>John Doe</strong> <small class="text-muted">2025-01-26 12:34 PM</small></p>
-            <p class="mb-1">This is a sample message from another user.</p>
         </div>
 
-
-
-        < !-- Example message (from me) -- >
-        <div class="message mb-3">
-            <div class="d-flex justify-content-between">
-                <div>
-                    <p class="mb-1"><strong>You</strong> <small class="text-muted">2025-01-26 12:35 PM</small></p>
-                    <p class="mb-1">This is a sample message from me.</p>
-                </div>
-                <div class="d-flex justify-content-start align-items-center">
-                    <button class="btn btn-outline-danger btn-sm me-2">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                    <button class="btn btn-outline-primary btn-sm">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                </div>
+        <!-- Message input form -->
+        <form class="mt-3" id="messageForm">
+            <div class="input-group">
+                <input type="text" class="form-control" id="messageInput" name="message"
+                       placeholder="Type your message..." required>
+                <button type="submit" class="btn btn-primary">Send</button>
             </div>
-        </div>
-
-        <div class="message mb-3">
-            <div class="d-flex justify-content-between">
-                <div>
-                    <p class="mb-1"><strong>You</strong> <small class="text-muted">2025-01-26 12:35 PM</small></p>
-                    <p class="mb-1">This is a sample message from me.</p>
-                </div>
-                <div class="d-flex align-items-start">
-                    <button class="btn btn-sm btn-outline-danger me-2">Delete</button>
-                    <button class="btn btn-sm btn-outline-primary">Edit</button>
-                </div>
-            </div>
-        </div>
-        <div class="message mb-3">
-            <div class="d-flex justify-content-between">
-                <div>
-                    <p class="mb-1">
-                        <strong>You</strong>
-                        <small class="text-muted me-2">2025-01-26 12:35 PM</small>
-                        <button class="btn bi bi-trash"></button>
-                        <button class="btn bi bi-pencil"></button>
-                    </p>
-                    <p class="mb-1">This is a sample message from me.</p>
-                </div>
-            </div>
-        </div>
--->
+            <p class="text-danger mb-0" id="errMsg"></p>
+        </form>
     </div>
 
-    <!-- Message input form -->
-    <form class="mt-3" id="messageForm">
-        <div class="input-group">
-            <input type="text" class="form-control" id="messageInput" name="message" placeholder="Type your message..." required>
-            <button type="submit" class="btn btn-primary">Send</button>
-        </div>
-        <p class="text-danger mb-0" id="errMsg"></p>
-    </form>
 </div>
 
 

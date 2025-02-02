@@ -58,11 +58,20 @@ exports.searchMsg = async (req, res) => {
             return res.status(400).json({error: 'Search term is required'});
         }
         const messages = await Message.findAll({
+            attributes: {
+                include: [
+                    [
+                        Sequelize.literal(`CASE WHEN "user_id" = ${req.session.user.id} THEN true ELSE false END`),
+                        'isMine',
+                    ],
+                ],
+            },
             where: {
                 content: {
                     [Op.like]: `%${searchTerm}%`
-                }
                 },
+                deleted: false
+            },
             include: [{
                 model: User,
                 attributes: ['firstName', 'lastName']
