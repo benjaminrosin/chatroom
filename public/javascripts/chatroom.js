@@ -60,12 +60,9 @@ const DOM = (function() {
                 return;
             }
 
-            const data = await response.json();
+            /*const data = await response.json();
 
             if (!response.ok) {
-                if (Array.isArray(data.error?.errors)){
-                    throw new Error(data.error.errors[0].message);
-                }
                 throw new Error(data.message);
             }
 
@@ -73,9 +70,9 @@ const DOM = (function() {
             displayMessages(data.messages);
             input.value = '';
             err_msg.innerHTML = '';
-            scrollToBottom();
+            scrollToBottom();*/
 
-            /*else if (response.ok) {
+            else if (response.ok) {
                 last_updated = Date.now();
                 const {messages} = await response.json();
                 displayMessages(messages);
@@ -85,8 +82,12 @@ const DOM = (function() {
                 scrollToBottom();
             }
             else {
-                throw new Error("cannot add message");
-            }*/
+                //--------------------------------------------------------------------------------------
+                if (Array.isArray(data.error?.errors)){
+                    throw new Error(data.error.errors[0].message);
+                }
+                throw new Error(data.message);
+            }
         } catch (error) {
             err_msg.innerHTML = error.message;
         }
@@ -119,7 +120,21 @@ const DOM = (function() {
                 window.location.href = response.url;
                 return;
             }
+            else if (response.ok) {
+                const { messages } = await response.json();
 
+                document.getElementById('searchTermDisplay').textContent = `Found ${messages.length} messages for: "${searchTerm}"`;
+                document.getElementById('searchResultsMessageArea').innerHTML= '';
+
+                displayMessages(messages, false,'searchResultsMessageArea');
+
+                err_msg.innerHTML = '';
+                searchInput.value = '';
+            }
+            else {
+                throw new Error('Failed to search message');
+            }
+/*
             const data = await response.json();
 
             if (!response.ok) {
@@ -132,7 +147,7 @@ const DOM = (function() {
 
             displayMessages(data.messages, false,'searchResultsMessageArea');
 
-
+*/
             /*
             document.getElementById('searchTermDisplay').textContent = `Search results for: "${searchTerm}"`;
             document.getElementById('searchResults').classList.remove('d-none');
@@ -145,8 +160,6 @@ const DOM = (function() {
                 systemMessages.innerHTML = '';
                 displayMessages(data.messages);
             }*/
-            err_msg.innerHTML = '';
-            searchInput.value = '';
 
             /*else if (response.ok) {
                 const { messages } = await response.json();
@@ -160,6 +173,8 @@ const DOM = (function() {
                 }
                 else{
                     systemMessages.innerHTML = '';
+                }* /
+                displayMessages(messages, false,'searchResultsMessageArea');
                 }
                 displayMessages(data.messages, false,'searchResultsMessageArea');
 
@@ -231,31 +246,19 @@ const DOM = (function() {
                 window.location.href = response.url;
                 return;
             }
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message);
-            }
-
-            last_updated = Date.now();
-            displayMessages(data.messages, false);
-            editMessageMode(event);
-
-                /*else if (response.ok) {
+            else if (response.ok) {
                     last_updated = Date.now();
                     const {messages} = await response.json();
                     displayMessages(messages, false);
                     editMessageMode(event);
-                }*/
-            /*else if(response.status === 401 || response.status === 403) {
-                window.location.href = '/login';
             }
             else {
-                throw new Error('Failed to delete message');
-            }*/
-        } catch (error) {
+                window.location.href = '/error';
+            }
+        }
+        catch (error) {
             console.error(error);
+            window.location.href = '/error';
         }
     }
 
@@ -274,33 +277,20 @@ const DOM = (function() {
                 window.location.href = response.url;
                 return;
             }
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message);
-            }
-
-            last_updated = Date.now();
-            displayMessages(data.messages, false);
-
-            /*else if (response.ok) {
+            else if (response.ok) {
                 last_updated = Date.now();
                 const {messages} = await response.json();
                 displayMessages(messages, false);
-
-            } */
-            /*else if(response.status === 401 || response.status === 403) {
-                window.location.href = '/login';
             }
             else {
-                throw new Error('Failed to delete message');
-            }*/
+                window.location.href = '/error';
+            }
         } catch (error) {
             console.error(error);
+            window.location.href = '/error';
         }
     }
-
+/*
     async function update() {
         try {
             const response = await fetch('/api/update', {
@@ -331,9 +321,9 @@ const DOM = (function() {
             console.error('Error updating messages:', error.message);
         }
     }
-
-    /*async function update(){
-        const response = await fetch('/chatroom/update', {
+*/
+    async function update(){
+        const response = await fetch('/api/update', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -351,10 +341,10 @@ const DOM = (function() {
             displayMessages(messages);
         }
         else {
-            throw new Error("cannot refresh");
+            console.error('Error updating messages');
+            //throw new Error("cannot refresh");
         }
     }
-    */
 
     /*function displayMessages(messages){
         const msg_area = document.getElementById('messageArea');

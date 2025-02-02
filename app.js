@@ -9,7 +9,8 @@ const loginRouter = require('./routes/login');
 const signupRouter = require('./routes/signup');
 const chatRouter = require('./routes/chatroom');
 const apiRouter = require('./routes/api');
-
+const errorRouter = require('./routes/error');
+const flash = require('connect-flash');
 
 const app = express();
 
@@ -41,6 +42,8 @@ app.use(session({
   rolling: false,
   cookie: {maxAge: 60* 60 * 1000} // 1 hour
 }));
+
+app.use(flash());
 
 app.get('/logout', function(req, res) {
   req.session.destroy((err) => {
@@ -87,30 +90,13 @@ app.use('/login', loginRouter);
 app.use('/signup', signupRouter);
 app.use('/api', authMiddleware,apiRouter);
 app.use('/chatroom', authMiddleware, chatRouter);
+app.use('/error', errorRouter);
 
 //app.use('/chatroom', chatRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
-});
-
-app.use(function(err, req, res, next) {
-  console.error('Error:', err);
-
-  const isApiRequest = req.xhr || req.headers.accept?.indexOf('json') > -1;
-
-  if (isApiRequest) {
-    return res.status(err.status || 500).json({
-      status: 'error',
-      message: err.message || 'Something went wrong'
-    });
-  }
-
-  res.locals.message = err.message;
-  res.locals.error = err;
-  res.status(err.status || 500);
-  res.render('error');
 });
 
 // error handler
@@ -121,7 +107,11 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render('error');
+  res.render('error', {
+    title: 'Error!',
+    message: err.message,
+    error: res.locals.error
+  });
 });
 
 module.exports = app;
