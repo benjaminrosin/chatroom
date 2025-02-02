@@ -24,10 +24,8 @@ exports.searchMsg = async (req, res) => {
         const searchTerm = req.body.searchTerm;
 
         if (!searchTerm) {
-            req.flash('title', 'Error!');
-            req.flash('error', 'Search term is required');
-            req.flash('status', 400);
-            return res.redirect('/error');
+            return await flashNrediredc(req, res, 'error','Search term is required', 400);
+
         }
 
         const messages = await Message.findAll({
@@ -54,10 +52,7 @@ exports.searchMsg = async (req, res) => {
     }
     catch (err){
         console.error('Error in searchMsg:', err);
-        req.flash('title', 'Error!');
-        req.flash('error', 'Failed to search messages');
-        req.flash('status', 500);
-        return res.redirect('/error');
+        return await flashNrediredc(req, res, 'error','Failed to search messages', 500);
 
     }
 }
@@ -73,17 +68,13 @@ exports.editMsg = async (req, res) => {
         });
 
         if (!message) {
-            req.flash('title', 'Error!');
-            req.flash('error', 'Message not found');
-            req.flash('status', 404);
-            return res.redirect('/error');
+            return await flashNrediredc(req, res, 'error','Message not found', 404);
+
         }
 
         if (message.user_id !== userId) {
-            req.flash('title', 'Error!');
-            req.flash('error', 'You are not authorized to edit this message');
-            req.flash('status', 403);
-            return res.redirect('/error');
+            return await flashNrediredc(req, res, 'error','You are not authorized to edit this message', 403);
+
         }
 
         const messageToEdit = await Message.update(
@@ -92,21 +83,14 @@ exports.editMsg = async (req, res) => {
         );
 
         if (messageToEdit[0] === 0) {
-            req.flash('title', 'Error!');
-            req.flash('error', 'Message not found or cannot be edited');
-            req.flash('status', 404);
-            return res.redirect('/error');
+            return await flashNrediredc(req, res, 'error','Message not found or cannot be edited', 404);
+
         }
         await update(req, res);
     }
     catch (err) {
         console.error('Error in editMsg:', err);
-
-        req.flash('title', 'Error!');
-        req.flash('error', 'Failed to edit message');
-        req.flash('status', 500);
-        req.flash('details', err.message);
-        return res.redirect('/error');
+        return await flashNrediredc(req, res, 'error','Failed to edit message', 500, err.message);
     }
 }
 
@@ -121,28 +105,21 @@ exports.deleteMsg = async (req, res) => {
         });
 
         if (!message) {
-            req.flash('title', 'Error!');
-            req.flash('error', 'Message not found');
-            req.flash('status', 404);
-            return res.redirect('/error');
+            return await flashNrediredc(req, res, 'error','Message not found', 404);
+
         }
 
         if (message.user_id !== userId) {
-            req.flash('title', 'Error!');
-            req.flash('error', 'You are not authorized to delete this message');
-            req.flash('status', 403);
-            return res.redirect('/error');
+            return await flashNrediredc(req, res, 'error','You are not authorized to delete this message', 403);
         }
+
         const effectedRows = await Message.update(
             { deleted: true },
             { where: {id:messageId}
             });
 
         if (effectedRows === 0) {
-            req.flash('title', 'Error!');
-            req.flash('error', 'Message not found or cannot be deleted');
-            req.flash('status', 404);
-            return res.redirect('/error');
+            return await flashNrediredc(req, res, 'error','Message not found or cannot be deleted', 404);
         }
 
         await update(req, res);
@@ -150,11 +127,7 @@ exports.deleteMsg = async (req, res) => {
     catch (err) {
         console.error('Error in deleteMsg:', err);
 
-        req.flash('title', 'Error!');
-        req.flash('error', 'Failed to delete message');
-        req.flash('status', 500);
-        req.flash('details', err.message);
-        return res.redirect('/error');
+        return await flashNrediredc(req, res, 'error','Failed to delete message', 500, err.message);
     }
 }
 
@@ -189,11 +162,17 @@ async function update(req, res) {
     }
     catch (err){
         console.error('Error in update:', err);
-        req.flash('title', 'Error!');
-        req.flash('error', 'Cannot update messages');
-        req.flash('status', 500);
-        return res.redirect('/error');
+
+        return await flashNrediredc(req, res, 'error','Cannot update messages', 500);
     }
+}
+
+async function flashNrediredc(req, res, title, error, status, details = '', url = '/error') {
+    req.flash('title', title);
+    req.flash('error', error);
+    req.flash('status', status);
+    req.flash('details', details);
+    return res.redirect(url);
 }
 
 exports.update = update;

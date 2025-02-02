@@ -1,12 +1,10 @@
 
 <%- include('includes/head.ejs') %>
-<script src=""></script>
-
 <script src="/javascripts/chatroom.js"></script>
-<!----------------------------------------------------------------->
+
+
 </head>
 <body>
-<!-- Navbar -->
 
 <input type="hidden" id="user-id" value="<%= user_id %>">
 
@@ -45,8 +43,6 @@
 <!-- Main content -->
 <div class="container mt-4">
 
-    <div id="systemMessages"></div>
-
     <div id="searchResults" class="d-none">
         <div class="d-flex justify-content-between align-items-center pb-3">
             <span id="searchTermDisplay"></span>
@@ -61,7 +57,7 @@
 
     <div class="chatroom"  id="chatroom">
         <div class="message-area border rounded p-3" id="messageArea" style="height: 60vh; overflow-y: auto;">
-            <!-- Example message (from others) -->
+            <!-- old messages -->
             <% messages.forEach(message =>{
             if(message.user_id === user_id){ %>
                 <div class="message mb-3" data-id= <%= message.id %>>
@@ -75,7 +71,7 @@
                             </p>
                             <p class="mb-1 msg-display"><%= message.content %></p>
                             <form class="input-group mb-3 msg-edit d-none">
-                                <input type="text" class="form-control" pattern=".*/S.*" required>
+                                <input type="text" class="form-control" pattern=".*\S.*" required>
                                 <button class="btn btn-outline-secondary bi bi-floppy-fill" type="submit"></button>
                                 <button class="btn btn-outline-secondary bi bi-x-circle" type="button"></button>
                             </form>
