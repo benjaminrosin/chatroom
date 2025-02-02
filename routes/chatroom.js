@@ -2,9 +2,8 @@ var express = require('express');
 var router = express.Router();
 const messageController = require('../controllers/messageHandler')
 
-
 router.get('/', messageController.getchat)
-
+/*
 router.get('/add', messageController.unexpected)
 
 router.post('/add', messageController.addMsg)
@@ -24,6 +23,8 @@ router.delete('/delete', messageController.deleteMsg)
 router.get('/update', messageController.unexpected)
 
 router.post('/update', messageController.update)
+
+ */
 /*
 router.get('/add', function(req, res, next) {
     res.redirect('/chatroom');

@@ -8,6 +8,7 @@ const Message = sequelize.define('Message', {
             type: DataTypes.TEXT,
             allowNull: false,
             validate: {
+                notEmpty: true,
             }
         },
         deleted: {

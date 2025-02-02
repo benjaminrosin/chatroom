@@ -1,33 +1,7 @@
 const {User, Message} = require('../models/user');
 const {Sequelize, Op} = require("sequelize");
 
-exports.getchat = async (req, res) => {
-    // load all old messages
-    try{
-        const newMessages = await Message.findAll({
-            include: [{
-                model: User,
-                attributes: ['firstName', 'lastName']
-            }],
-            where: [{
-                deleted: false
-            }]
-        });
-        const user = await User.findOne({
-            select: ['firstName'],
-            where:{id: req.session.user.id}
-        });
 
-        res.render('chatroom', { title: 'Chat', firstName: user.firstName, messages: newMessages, user_id: req.session.user.id});
-    }
-    catch(err) {
-        res.render('error', {
-            message: 'Could not load chat room',
-            error: err
-        });
-    }
-}
-/*
 exports.addMsg = async (req, res) => {
     try{
         const content = req.body.message;
@@ -47,7 +21,7 @@ exports.addMsg = async (req, res) => {
         /*res.status(500).json({
             status: 'error',
             message: 'Could not add message'
-        });* /
+        });*/
         res.status(500).json({error: err});
 
     }
@@ -59,7 +33,7 @@ exports.searchMsg = async (req, res) => {
 
         /*if (!searchTerm) {
             return res.status(400).json({error: 'Search term is required'});
-        }* /
+        }*/
 
         if (!searchTerm) {
             return res.status(400).json({
@@ -147,11 +121,7 @@ exports.deleteMsg = async (req, res) => {
         });
     }
 }
-*/
-exports.unexpected = async (req, res) => {
-    res.redirect('/chatroom');
-}
-/*
+
 async function update(req, res) {
     try {
         const newMessages = await Message.findAll({
@@ -176,16 +146,12 @@ async function update(req, res) {
             }
         });
 
-        //req.session.lastUpdate = Date.now()
-        //req.body.lastUpdate = Date.now();
-
         res.status(200).json({
             status: 'success',
             messages: newMessages
         });
     }
     catch (err){
-        console.error('Error in update:', err);
         res.status(500).json({
             status: 'error',
             message: 'Cannot update messages'
@@ -194,5 +160,3 @@ async function update(req, res) {
 }
 
 exports.update = update;
-
- */

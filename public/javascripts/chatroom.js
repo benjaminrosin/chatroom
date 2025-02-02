@@ -9,6 +9,7 @@ const DOM = (function() {
         if (intervalId) {
             clearInterval(intervalId);
         }
+
         intervalId = setInterval(update, POLLING*1000);
 
         document.getElementById('messageForm').addEventListener('submit', addMessage);
@@ -46,7 +47,7 @@ const DOM = (function() {
             if (!message){
                 throw new Error("message must contain data");
             }
-            const response = await fetch('/chatroom/add', {
+            const response = await fetch('/api/add', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -62,6 +63,9 @@ const DOM = (function() {
             const data = await response.json();
 
             if (!response.ok) {
+                if (Array.isArray(data.error?.errors)){
+                    throw new Error(data.error.errors[0].message);
+                }
                 throw new Error(data.message);
             }
 
@@ -104,7 +108,7 @@ const DOM = (function() {
             searchResults.classList.remove('d-none');
             document.getElementById("chatroom").classList.add('d-none');
 
-            const response = await fetch(`/chatroom/search`, {
+            const response = await fetch(`/api/search`, {
                 method: 'post',
                 headers: {
                     'Content-Type': 'application/json'
@@ -156,8 +160,8 @@ const DOM = (function() {
                 }
                 else{
                     systemMessages.innerHTML = '';
-                }*/
-                displayMessages(messages, false,'searchResultsMessageArea');
+                }
+                displayMessages(data.messages, false,'searchResultsMessageArea');
 
                 err_msg.innerHTML = '';
                 searchInput.value = '';
@@ -212,7 +216,7 @@ const DOM = (function() {
             return;
         }
         try {
-            const response = await fetch(`/chatroom/edit`, {
+            const response = await fetch(`/api/edit`, {
                 method: 'post',
                 headers: {
                     'Content-Type': 'application/json'
@@ -259,7 +263,7 @@ const DOM = (function() {
         const messageId = event.target.closest('.message').dataset.id;
 
         try {
-            const response = await fetch(`/chatroom/delete`, {
+            const response = await fetch(`/api/delete`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json'
@@ -299,7 +303,7 @@ const DOM = (function() {
 
     async function update() {
         try {
-            const response = await fetch('/chatroom/update', {
+            const response = await fetch('/api/update', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

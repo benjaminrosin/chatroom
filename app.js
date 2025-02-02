@@ -5,12 +5,11 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const sequelize = require('./models/index');
 const session = require('express-session')
-//var indexRouter = require('./routes/index');
-//var usersRouter = require('./routes/users');
 const loginRouter = require('./routes/login');
 const signupRouter = require('./routes/signup');
 const chatRouter = require('./routes/chatroom');
-//const passwordRouter = require('./routes/password');
+const apiRouter = require('./routes/api');
+
 
 const app = express();
 
@@ -39,7 +38,6 @@ app.use(session({
   secret: 'secretSessionId',
   resave: false,
   saveUninitialized: false,
-  //lastUpdated: new Date(),
   rolling: false,
   cookie: {maxAge: 60* 60 * 1000} // 1 hour
 }));
@@ -87,6 +85,7 @@ app.get('/', function(req, res, next) {
 */
 app.use('/login', loginRouter);
 app.use('/signup', signupRouter);
+app.use('/api', authMiddleware,apiRouter);
 app.use('/chatroom', authMiddleware, chatRouter);
 
 //app.use('/chatroom', chatRouter);
