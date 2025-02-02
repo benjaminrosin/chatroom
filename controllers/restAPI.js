@@ -7,10 +7,10 @@ exports.addMsg = async (req, res) => {
         const content = req.body.message;
 
         if (!content?.trim()) {
-            return res.status(400).json({
-                status: 'error',
-                message: 'Message cannot be empty'
-            });
+            req.flash('title', 'Error!');
+            req.flash('error', 'Message cannot be empty');
+            req.flash('status', 400);
+            return res.redirect('/error');
         }
 
         await Message.create({content: content, user_id: req.session.user.id});
@@ -18,12 +18,10 @@ exports.addMsg = async (req, res) => {
         await update(req, res);
     }
     catch(err) {
-        /*res.status(500).json({
-            status: 'error',
-            message: 'Could not add message'
-        });*/
-        res.status(500).json({error: err});
-
+        req.flash('title', 'Error!');
+        req.flash('error', 'Could not add message');
+        req.flash('status', 500);
+        return res.redirect('/error');
     }
 }
 
@@ -36,10 +34,10 @@ exports.searchMsg = async (req, res) => {
         }*/
 
         if (!searchTerm) {
-            return res.status(400).json({
-                status: 'error',
-                message: 'Search term is required'
-            });
+            req.flash('title', 'Error!');
+            req.flash('error', 'Search term is required');
+            req.flash('status', 400);
+            return res.redirect('/error');
         }
 
         const messages = await Message.findAll({
@@ -66,59 +64,114 @@ exports.searchMsg = async (req, res) => {
     }
     catch (err){
         console.error('Error in searchMsg:', err);
-        res.status(500).json({
-            status: 'error',
-            message: 'Failed to search messages'
-        });
+        req.flash('title', 'Error!');
+        req.flash('error', 'Failed to search messages');
+        req.flash('status', 500);
+        return res.redirect('/error');
+
     }
 }
 
 exports.editMsg = async (req, res) => {
     try{
+        if (!req.session.user) {
+            req.flash('title', 'Error!');
+            req.flash('error', 'Unauthorized');
+            req.flash('status', 401);
+            return res.redirect('/error');
+        }
+
         const { messageId, newContent } = req.body;
         const userId = req.session.user.id;
+
+        // Check if message exists and belongs to user
+        const message = await Message.findOne({
+            where: { id: messageId }
+        });
+
+        if (!message) {
+            req.flash('title', 'Error!');
+            req.flash('error', 'Message not found');
+            req.flash('status', 404);
+            return res.redirect('/error');
+        }
+
+        if (message.user_id !== userId) {
+            req.flash('title', 'Error!');
+            req.flash('error', 'You are not authorized to edit this message');
+            req.flash('status', 403);
+            return res.redirect('/error');
+        }
+
         const messageToEdit = await Message.update(
             {content: newContent},
             {where: {id: messageId, user_id: userId}}
         );
 
         if (messageToEdit[0] === 0) {
-            throw new Error('Message not found or cannot be edited');
+            req.flash('title', 'Error!');
+            req.flash('error', 'Message not found or cannot be edited');
+            req.flash('status', 404);
+            return res.redirect('/error');
         }
-
         await update(req, res);
-
     }
     catch (err) {
-        console.log(err);
         console.error('Error in editMsg:', err);
-        res.status(500).json({
-            status: 'error',
-            message: 'Failed to edit message'
-        });
+
+        req.flash('title', 'Error!');
+        req.flash('error', 'Failed to edit message');
+        req.flash('status', 500);
+        req.flash('details', err.message);
+        return res.redirect('/error');
     }
 }
 
 exports.deleteMsg = async (req, res) => {
     try {
         const { messageId } = req.body;
-        const effectedRows= Message.update(
+        const userId = req.session.user.id;
+
+        // Check if message exists and belongs to user
+        const message = await Message.findOne({
+            where: { id: messageId }
+        });
+
+        if (!message) {
+            req.flash('title', 'Error!');
+            req.flash('error', 'Message not found');
+            req.flash('status', 404);
+            return res.redirect('/error');
+        }
+
+        if (message.user_id !== userId) {
+            req.flash('title', 'Error!');
+            req.flash('error', 'You are not authorized to delete this message');
+            req.flash('status', 403);
+            return res.redirect('/error');
+        }
+        const effectedRows = await Message.update(
             { deleted: true },
             { where: {id:messageId}
             });
 
         if (effectedRows === 0) {
-            throw new Error('Message not found or cannot be deleted');
+            req.flash('title', 'Error!');
+            req.flash('error', 'Message not found or cannot be deleted');
+            req.flash('status', 404);
+            return res.redirect('/error');
         }
 
         await update(req, res);
     }
     catch (err) {
         console.error('Error in deleteMsg:', err);
-        res.status(500).json({
-            status: 'error',
-            message: 'Failed to delete message'
-        });
+
+        req.flash('title', 'Error!');
+        req.flash('error', 'Failed to delete message');
+        req.flash('status', 500);
+        req.flash('details', err.message);
+        return res.redirect('/error');
     }
 }
 
@@ -152,10 +205,11 @@ async function update(req, res) {
         });
     }
     catch (err){
-        res.status(500).json({
-            status: 'error',
-            message: 'Cannot update messages'
-        });
+        console.error('Error in update:', err);
+        req.flash('title', 'Error!');
+        req.flash('error', 'Cannot update messages');
+        req.flash('status', 500);
+        return res.redirect('/error');
     }
 }
 

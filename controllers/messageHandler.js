@@ -28,7 +28,7 @@ exports.getchat = async (req, res) => {
         });
     }
 }
-
+/*
 exports.addMsg = async (req, res) => {
     try{
         const content = req.body.message;
@@ -58,7 +58,7 @@ exports.searchMsg = async (req, res) => {
 
         /*if (!searchTerm) {
             return res.status(400).json({error: 'Search term is required'});
-        }*/
+        }* /
 
         if (!searchTerm) {
             req.flash('title', 'Error!');
@@ -201,11 +201,11 @@ exports.deleteMsg = async (req, res) => {
         return res.redirect('/error');
     }
 }
-
+*/
 exports.unexpected = async (req, res) => {
     res.redirect('/chatroom');
 }
-
+/*
 async function update(req, res) {
     try {
         const newMessages = await Message.findAll({
@@ -245,3 +245,5 @@ async function update(req, res) {
 }
 
 exports.update = update;
+
+ */
