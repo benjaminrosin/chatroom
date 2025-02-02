@@ -1,5 +1,8 @@
-
 const DOM = (function(){
+    /**
+     * Initializes signup form handlers and form auto-fill
+     * @listens DOMContentLoaded
+     */
     document.addEventListener("DOMContentLoaded", function (){
         const signUpForm = document.getElementById("signUpForm");
         const passwordForm = document.getElementById("passwordForm");
@@ -28,6 +31,9 @@ const DOM = (function(){
 
     })
 
+    /**
+     * Fills signup form fields with stored cookie data
+     */
     function fillFormWithCookies() {
         const registerData = getCookie("registerData");
         if (registerData) {
@@ -47,13 +53,17 @@ const DOM = (function(){
         }
     }
 
+    /**
+     * Retrieves and parses a cookie value by name
+     * @param {string} name - Name of the cookie to retrieve
+     * @returns {Object|null} Parsed cookie value or null if not found
+     */
     function getCookie(name) {
         if(!document.cookie){
             return null;
         }
         const cookies = document.cookie.split("; ");
         for (let cookie of cookies) {
-            //console.log(cookie)
             const [key, value] = cookie.split("=");
             if (key === name) {
                 try {
