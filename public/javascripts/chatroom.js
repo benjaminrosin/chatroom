@@ -125,27 +125,7 @@ const DOM = (function() {
                 return;
             }
 
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message);
-            }
-
-            document.getElementById('searchTermDisplay').textContent = `Search results for: "${searchTerm}"`;
-            document.getElementById('searchResults').classList.remove('d-none');
-
-            if (data.messages.length === 0) {
-                systemMessages.innerHTML = `<div class="alert alert-info">No messages found containing the word "${searchTerm}".</div>`;
-                displayMessages([]);
-            }
-            else{
-                systemMessages.innerHTML = '';
-                displayMessages(data.messages);
-            }
-            err_msg.innerHTML = '';
-            searchInput.value = '';
-
-            /*else if (response.ok) {
+            else if (response.ok) {
                 const { messages } = await response.json();
 
                 document.getElementById('searchTermDisplay').textContent = `Search results for: "${searchTerm}"`;
@@ -164,7 +144,7 @@ const DOM = (function() {
             }
             else {
                 throw new Error('Failed to search message');
-            }*/
+            }
         }
         catch (error) {
             //console.error(error);
@@ -235,31 +215,19 @@ const DOM = (function() {
                 window.location.href = response.url;
                 return;
             }
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message);
-            }
-
-            last_updated = Date.now();
-            displayMessages(data.messages);
-            editMessageMode(event);
-
-                /*else if (response.ok) {
+            else if (response.ok) {
                     last_updated = Date.now();
                     const {messages} = await response.json();
                     displayMessages(messages);
                     editMessageMode(event);
-                }*/
-            /*else if(response.status === 401 || response.status === 403) {
-                window.location.href = '/login';
             }
             else {
-                throw new Error('Failed to delete message');
-            }*/
-        } catch (error) {
+                window.location.href = '/error';
+            }
+        }
+        catch (error) {
             console.error(error);
+            window.location.href = '/error';
         }
     }
 
@@ -278,33 +246,20 @@ const DOM = (function() {
                 window.location.href = response.url;
                 return;
             }
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message);
-            }
-
-            last_updated = Date.now();
-            displayMessages(data.messages);
-
-            /*else if (response.ok) {
+            else if (response.ok) {
                 last_updated = Date.now();
                 const {messages} = await response.json();
                 displayMessages(messages);
-
-            } */
-            /*else if(response.status === 401 || response.status === 403) {
-                window.location.href = '/login';
             }
             else {
-                throw new Error('Failed to delete message');
-            }*/
+                window.location.href = '/error';
+            }
         } catch (error) {
             console.error(error);
+            window.location.href = '/error';
         }
     }
-
+/*
     async function update() {
         try {
             const response = await fetch('/chatroom/update', {
@@ -335,8 +290,8 @@ const DOM = (function() {
             console.error('Error updating messages:', error.message);
         }
     }
-
-    /*async function update(){
+*/
+    async function update(){
         const response = await fetch('/chatroom/update', {
             method: 'POST',
             headers: {
@@ -355,10 +310,10 @@ const DOM = (function() {
             displayMessages(messages);
         }
         else {
-            throw new Error("cannot refresh");
+            console.error('Error updating messages');
+            //throw new Error("cannot refresh");
         }
     }
-    */
 
     function displayMessages(messages){
         const msg_area = document.getElementById('messageArea');
