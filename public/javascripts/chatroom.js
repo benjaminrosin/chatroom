@@ -8,6 +8,7 @@ const DOM = (function() {
      * @listens DOMContentLoaded
      */
     document.addEventListener("DOMContentLoaded", function () {
+        last_updated = Date.now();
         const messageArea = document.getElementById('messageArea');
 
         if (intervalId) {
@@ -246,9 +247,6 @@ const DOM = (function() {
                 const {messages} = await response.json();
                 displayMessages(messages, false);
             }
-            /*else {
-                window.location.href = '/error';
-            }*/
         } catch (error) {
             console.error(error);
             window.location.href = '/error';

@@ -24,7 +24,14 @@ exports.getchat = async (req, res) => {
             where:{id: req.session.user.id}
         });
 
-        res.render('chatroom', { title: 'Chat', firstName: user.firstName, messages: newMessages, user_id: req.session.user.id});
+        const messages = newMessages.map(msg => {
+            const msgJSON = msg.toJSON();
+            msgJSON.content = decodeHTML(msgJSON.content);
+            return msgJSON;
+        });
+
+        newMessages.forEach((message) => {message.content = decodeHTML(message.content)})
+        res.render('chatroom', { title: 'Chat', firstName: user.firstName, messages: messages, user_id: req.session.user.id});
     }
     catch(err) {
         res.render('error', {
@@ -37,4 +44,13 @@ exports.getchat = async (req, res) => {
 
 exports.unexpected = async (req, res) => {
     res.redirect('/chatroom');
+}
+
+function decodeHTML(text) {
+    return text
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#039;/g, "'")
+        .replace(/&amp;/g, '&');
 }

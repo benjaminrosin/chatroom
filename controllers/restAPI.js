@@ -12,7 +12,9 @@ exports.addMsg = async (req, res) => {
         const content = req.body.message;
 
         if (!content?.trim()) {
-            return res.status(400).json({error: 'Message cannot be empty'});
+            //return res.status(400).json({error: 'Message cannot be empty'});
+            return await flashNrediredc(req, res, 'error','Message cannot be empty', 400);
+
         }
 
         await Message.create({content: content, user_id: req.session.user.id});
@@ -20,7 +22,8 @@ exports.addMsg = async (req, res) => {
         await update(req, res);
     }
     catch(err) {
-       return res.status(400).json({error:err});
+       //return res.status(400).json({error:err});
+        return await flashNrediredc(req, res, 'error','Failed to add messages', 504);
     }
 }
 
@@ -63,7 +66,7 @@ exports.searchMsg = async (req, res) => {
     }
     catch (err){
         console.error('Error in searchMsg:', err);
-        return await flashNrediredc(req, res, 'error','Failed to search messages', 500);
+        return await flashNrediredc(req, res, 'error','Failed to search messages', 504);
 
     }
 }
@@ -106,8 +109,7 @@ exports.editMsg = async (req, res) => {
         await update(req, res);
     }
     catch (err) {
-        console.error('Error in editMsg:', err);
-        return await flashNrediredc(req, res, 'error','Failed to edit message', 500, err.message);
+        return await flashNrediredc(req, res, 'error','Failed to edit message', 504, err.message);
     }
 }
 
@@ -148,9 +150,7 @@ exports.deleteMsg = async (req, res) => {
         await update(req, res);
     }
     catch (err) {
-        console.error('Error in deleteMsg:', err);
-
-        return await flashNrediredc(req, res, 'error','Failed to delete message', 500, err.message);
+        return await flashNrediredc(req, res, 'error','Failed to delete message', 504, err.message);
     }
 }
 
@@ -190,9 +190,7 @@ async function update(req, res) {
         });
     }
     catch (err){
-        console.error('Error in update:', err);
-
-        return await flashNrediredc(req, res, 'error','Cannot update messages', 500);
+        return await flashNrediredc(req, res, 'error','Cannot update messages', 504);
     }
 }
 
